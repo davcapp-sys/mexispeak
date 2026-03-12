@@ -1549,6 +1549,25 @@
         </div>
       </div>
 
+      <!-- Claude AI setup bar -->
+      <div id="claude-key-wrap" style="width:100%;max-width:700px;background:var(--card-front);border:2px solid var(--accent3);border-radius:12px;padding:10px 16px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="color:var(--accent3);font-size:0.78rem;font-weight:900;letter-spacing:1px;white-space:nowrap;">🤖 CLAUDE AI</span>
+          <input id="claude-api-key-input" type="password" placeholder="Paste Anthropic API key (sk-ant-…) to enable smart answer checking"
+            style="flex:1;min-width:180px;background:var(--btn-bg);border:2px solid var(--accent3);border-radius:8px;
+                   color:#fff;font-family:'Nunito',sans-serif;font-size:0.82rem;padding:6px 10px;outline:none;"
+            oninput="saveApiKey()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+          <span id="claude-key-status" style="font-size:0.8rem;font-weight:800;white-space:nowrap;"></span>
+          <button onclick="clearApiKey()"
+            style="background:transparent;border:2px solid var(--accent4);border-radius:8px;color:var(--accent4);
+                   font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;padding:5px 10px;cursor:pointer;">Clear</button>
+        </div>
+        <div style="color:var(--text-sub);font-size:0.7rem;margin-top:4px;">
+          When a key is set, wrong answers get a second opinion from Claude — so synonyms &amp; alternate phrasings count as correct.
+          Get a free key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent3);">console.anthropic.com</a>
+        </div>
+      </div>
+
       <!-- Question card -->
       <div id="quiz-card" style="width:min(96%,700px);background:var(--card-front);border:2px solid var(--accent1);border-radius:var(--radius);padding:28px 32px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:var(--shadow);flex-shrink:0;min-height:140px;justify-content:center;">
         <div id="quiz-card-label" style="font-size:0.7rem;font-weight:900;letter-spacing:3px;color:var(--accent1);text-transform:uppercase;"></div>
@@ -1579,6 +1598,7 @@
 
       <!-- Feedback -->
       <div id="quiz-feedback" style="font-size:1.1rem;font-weight:800;text-align:center;min-height:28px;flex-shrink:0;"></div>
+
 
       <!-- Next button -->
       <button id="quiz-next-btn" onclick="quizNext()" style="display:none;background:var(--accent1);color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;padding:12px 32px;cursor:pointer;">Next →</button>
@@ -6012,6 +6032,7 @@ function getDistractors(card, allCards, count) {
 
 function initQuizScreen() {
   startQuiz();
+  initClaudeKeyUI();
 }
 
 function startQuiz() {
@@ -6189,6 +6210,7 @@ function setQuizMode(mode) {
   document.getElementById('mode-mc-btn').classList.toggle('active', mode === 'mc');
   document.getElementById('mode-type-btn').classList.toggle('active', mode === 'type');
   startQuiz();
+
 }
 
 function insertAccent(ch) {
@@ -6236,7 +6258,77 @@ function checkTypedMatch(typed, correct) {
   return { exactMatch, accentlessMatch, isCorrect: exactMatch || accentlessMatch };
 }
 
-function submitTypedAnswer() {
+function saveApiKey() {
+  const val = document.getElementById('claude-api-key-input').value.trim();
+  if (val) localStorage.setItem('mexispeak_claude_key', val);
+  updateKeyStatus();
+}
+function clearApiKey() {
+  localStorage.removeItem('mexispeak_claude_key');
+  document.getElementById('claude-api-key-input').value = '';
+  updateKeyStatus();
+}
+function getApiKey() {
+  return localStorage.getItem('mexispeak_claude_key') || '';
+}
+function updateKeyStatus() {
+  const key = getApiKey();
+  const el = document.getElementById('claude-key-status');
+  if (!el) return;
+  if (key) {
+    el.textContent = '✅ Active';
+    el.style.color = 'var(--green)';
+  } else {
+    el.textContent = '(no key)';
+    el.style.color = 'var(--text-sub)';
+  }
+}
+function initClaudeKeyUI() {
+  const saved = getApiKey();
+  if (saved) document.getElementById('claude-api-key-input').value = saved;
+  updateKeyStatus();
+}
+
+async function askClaude(question, typed, correct) {
+  const key = getApiKey();
+  if (!key) return null;
+  const prompt = `You are a Mexican Spanish language teacher marking a student's written answer.
+
+Question shown to student (in English): "${question}"
+Expected answer on the card: "${correct}"
+Student typed: "${typed}"
+
+Is the student's answer a valid, natural Mexican Spanish translation of the English question — even if it differs from the expected answer? Consider synonyms, regional Mexican variants, alternate phrasings, optional words (like usted), and minor grammatical variations.
+
+Reply with ONLY one of these two words:
+CORRECT
+WRONG`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const reply = (data.content?.[0]?.text || '').trim().toUpperCase();
+    return reply.startsWith('CORRECT');
+  } catch(e) {
+    return null;
+  }
+}
+
+async function submitTypedAnswer() {
   if (quizAnswered) return;
   const inp = document.getElementById('quiz-type-input');
   const typed = (inp.value || '').trim();
@@ -6249,6 +6341,34 @@ function submitTypedAnswer() {
   const correct = card.answer.trim();
   const { exactMatch, accentlessMatch, isCorrect } = checkTypedMatch(typed, correct);
 
+  const fb = document.getElementById('quiz-feedback');
+
+  if (isCorrect) {
+    // Local match — no need for Claude
+    finishTypedAnswer(inp, typed, correct, exactMatch, accentlessMatch, false, card);
+  } else {
+    // Local check failed — try Claude if key is set
+    const key = getApiKey();
+    if (key) {
+      inp.classList.add('accent-flag');
+      fb.innerHTML = '🤖 Checking with Claude…';
+      fb.style.color = 'var(--accent3)';
+      const claudeCorrect = await askClaude(card.question, typed, correct);
+      inp.classList.remove('accent-flag');
+      if (claudeCorrect === true) {
+        finishTypedAnswer(inp, typed, correct, false, false, true, card);
+      } else {
+        finishTypedAnswer(inp, typed, correct, false, false, false, card);
+      }
+    } else {
+      finishTypedAnswer(inp, typed, correct, false, false, false, card);
+    }
+  }
+}
+
+function finishTypedAnswer(inp, typed, correct, exactMatch, accentlessMatch, claudeCorrect, card) {
+  const isCorrect = exactMatch || accentlessMatch || claudeCorrect;
+
   quizSessionTotal++;
   if (isCorrect) quizSessionCorrect++;
 
@@ -6256,7 +6376,7 @@ function submitTypedAnswer() {
   srData[card.cardId] = scheduleCard(srData[card.cardId], isCorrect);
   saveSR(quizDeckKey, srData);
 
-  if (exactMatch) {
+  if (exactMatch || claudeCorrect) {
     inp.classList.add('correct');
   } else if (accentlessMatch) {
     inp.classList.add('accent-flag');
@@ -6268,6 +6388,9 @@ function submitTypedAnswer() {
   const fb = document.getElementById('quiz-feedback');
   if (exactMatch) {
     fb.textContent = '\u2705 Correct!';
+    fb.style.color = 'var(--green)';
+  } else if (claudeCorrect) {
+    fb.innerHTML = '\u2705 Also correct! Expected: <span style="color:var(--accent2);font-size:1em;">' + correct + '</span>';
     fb.style.color = 'var(--green)';
   } else if (accentlessMatch) {
     fb.innerHTML = '\u2705 Correct \u2014 but watch the accents: <span style="color:var(--accent2);font-size:1.1em;">' + correct + '</span>';
@@ -6281,13 +6404,13 @@ function submitTypedAnswer() {
     quizSessionTotal > 0 ? '\u2705 ' + quizSessionCorrect + ' / ' + quizSessionTotal : '';
 
   quizIdx++;
+  const delay = accentlessMatch ? 3000 : (claudeCorrect ? 2500 : 900);
   if (isCorrect) {
-    setTimeout(() => { if (quizAnswered) quizNext(); }, accentlessMatch ? 3000 : 900);
+    setTimeout(() => { if (quizAnswered) quizNext(); }, delay);
   } else {
     document.getElementById('quiz-next-btn').style.display = 'inline-block';
   }
 }
-
 
 function showQuizDone() {
   document.getElementById('quiz-card').style.display = 'none';
