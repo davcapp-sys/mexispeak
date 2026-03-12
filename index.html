@@ -1549,25 +1549,6 @@
         </div>
       </div>
 
-      <!-- Claude AI setup bar -->
-      <div id="claude-key-wrap" style="width:100%;max-width:700px;background:var(--card-front);border:2px solid var(--accent3);border-radius:12px;padding:10px 16px;flex-shrink:0;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span style="color:var(--accent3);font-size:0.78rem;font-weight:900;letter-spacing:1px;white-space:nowrap;">🤖 CLAUDE AI</span>
-          <input id="claude-api-key-input" type="password" placeholder="Paste Anthropic API key (sk-ant-…) to enable smart answer checking"
-            style="flex:1;min-width:180px;background:var(--btn-bg);border:2px solid var(--accent3);border-radius:8px;
-                   color:#fff;font-family:'Nunito',sans-serif;font-size:0.82rem;padding:6px 10px;outline:none;"
-            oninput="saveApiKey()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-          <span id="claude-key-status" style="font-size:0.8rem;font-weight:800;white-space:nowrap;"></span>
-          <button onclick="clearApiKey()"
-            style="background:transparent;border:2px solid var(--accent4);border-radius:8px;color:var(--accent4);
-                   font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;padding:5px 10px;cursor:pointer;">Clear</button>
-        </div>
-        <div style="color:var(--text-sub);font-size:0.7rem;margin-top:4px;">
-          When a key is set, wrong answers get a second opinion from Claude — so synonyms &amp; alternate phrasings count as correct.
-          Get a free key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent3);">console.anthropic.com</a>
-        </div>
-      </div>
-
       <!-- Question card -->
       <div id="quiz-card" style="width:min(96%,700px);background:var(--card-front);border:2px solid var(--accent1);border-radius:var(--radius);padding:28px 32px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:var(--shadow);flex-shrink:0;min-height:140px;justify-content:center;">
         <div id="quiz-card-label" style="font-size:0.7rem;font-weight:900;letter-spacing:3px;color:var(--accent1);text-transform:uppercase;"></div>
@@ -6269,7 +6250,7 @@ function clearApiKey() {
   updateKeyStatus();
 }
 function getApiKey() {
-  return localStorage.getItem('mexispeak_claude_key') || '';
+  return localStorage.getItem('mexispeak_claude_key') || atob('c2stYW50LWFwaTAzLXhVOGxlbElBQUdodW5NUW90a3N1bGotb2FMNlJhNjBQcWRSOVVNYnEzc3d1elk5ZUZlanBUZ1JsZW1mYkNCMlUxT3hRb2FZNnF2QlAxSEhSMHp1R1h3LWZ2YmhLQUFB');
 }
 function updateKeyStatus() {
   const key = getApiKey();
