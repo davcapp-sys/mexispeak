@@ -1162,7 +1162,7 @@
       </div>
     </div>
     <div id="nav-btn-row">
-      <button class="nav-btn active" onclick="showScreen('top150')">🏆 Top 150</button>
+      <button class="nav-btn active" onclick="showScreen('top150')">🏆 Top 150 Verbs</button>
       <button class="nav-btn" onclick="showScreen('pret')">⏮ Pretérito</button>
       <button class="nav-btn" onclick="showScreen('imp')">〰 Imperfect</button>
       <button class="nav-btn" onclick="showScreen('subj')">💭 Subjunctive</button>
@@ -6205,6 +6205,27 @@ function stripAccents(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+function normaliseAnswer(str) {
+  let s = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  s = s.replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '');
+  s = s.replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  return s;
+}
+
+function checkTypedMatch(typed, correct) {
+  const variants = correct.split(/[\/,]/).map(v => v.trim()).filter(Boolean);
+  const normTyped = normaliseAnswer(typed);
+  let exactMatch = false;
+  let accentlessMatch = false;
+  for (const v of variants) {
+    const normV = normaliseAnswer(v);
+    if (typed.toLowerCase().trim() === v.toLowerCase().trim()) { exactMatch = true; break; }
+    if (normTyped === normV) accentlessMatch = true;
+  }
+  if (exactMatch) accentlessMatch = false;
+  return { exactMatch, accentlessMatch, isCorrect: exactMatch || accentlessMatch };
+}
+
 function submitTypedAnswer() {
   if (quizAnswered) return;
   const inp = document.getElementById('quiz-type-input');
@@ -6216,45 +6237,36 @@ function submitTypedAnswer() {
 
   const card = quizDeck[quizIdx];
   const correct = card.answer.trim();
-
-  const typedStripped   = stripAccents(typed.toLowerCase());
-  const correctStripped = stripAccents(correct.toLowerCase());
-  const exactMatch      = typed.toLowerCase() === correct.toLowerCase();
-  const accentlessMatch = !exactMatch && typedStripped === correctStripped;
-  const isCorrect       = exactMatch || accentlessMatch;
+  const { exactMatch, accentlessMatch, isCorrect } = checkTypedMatch(typed, correct);
 
   quizSessionTotal++;
   if (isCorrect) quizSessionCorrect++;
 
-  // SR
   const srData = loadSR(quizDeckKey);
   srData[card.cardId] = scheduleCard(srData[card.cardId], isCorrect);
   saveSR(quizDeckKey, srData);
 
-  // Input styling
   if (exactMatch) {
     inp.classList.add('correct');
   } else if (accentlessMatch) {
     inp.classList.add('accent-flag');
   } else {
     inp.classList.add('wrong');
-    inp.value = correct; // show correct answer in the box
+    inp.value = correct;
   }
 
-  // Feedback text
   const fb = document.getElementById('quiz-feedback');
   if (exactMatch) {
-    fb.textContent = '✅ Correct!';
+    fb.textContent = '\u2705 Correct!';
     fb.style.color = 'var(--green)';
   } else if (accentlessMatch) {
-    fb.innerHTML = '✅ Correct — but watch the accents: <span style="color:var(--accent2);font-size:1.1em;">' + correct + '</span>';
+    fb.innerHTML = '\u2705 Correct \u2014 but watch the accents: <span style="color:var(--accent2);font-size:1.1em;">' + correct + '</span>';
     fb.style.color = 'var(--accent2)';
   } else {
-    fb.innerHTML = '❌ The answer is: <span style="color:var(--accent4);font-size:1.1em;">' + correct + '</span>';
+    fb.innerHTML = '\u274c The answer is: <span style="color:var(--accent4);font-size:1.1em;">' + correct + '</span>';
     fb.style.color = 'var(--accent4)';
   }
 
-  // Score display
   document.getElementById('quiz-score-display').textContent =
     quizSessionTotal > 0 ? '\u2705 ' + quizSessionCorrect + ' / ' + quizSessionTotal : '';
 
