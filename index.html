@@ -574,27 +574,31 @@
   }
   #t150-conj-table {
     width: 100%;
+    flex-shrink: 1;
+    min-height: 0;
   }
   #t150-conj-table .verb-row {
     display: flex;
     gap: 8px;
-    align-items: baseline;
-    padding: 3px 0;
+    align-items: center;
+    padding: 2px 0;
     border-bottom: 1px solid rgba(78,205,196,0.1);
+    flex-shrink: 1;
   }
   #t150-conj-table .verb-row:last-child { border-bottom: none; }
-  #t150-conj-table .pronoun { color: var(--accent3); font-weight: 700; min-width: clamp(100px, 16vw, 180px); font-size: clamp(0.85rem, 1.8vw, 1.2rem); }
-  #t150-conj-table .conjugation { color: var(--accent2); font-weight: 900; font-size: clamp(0.95rem, 2vw, 1.4rem); }
+  #t150-conj-table .pronoun { color: var(--accent3); font-weight: 700; min-width: clamp(90px, 13vw, 160px); font-size: clamp(0.78rem, 1.5vw, 1.05rem); line-height: 1.2; }
+  #t150-conj-table .conjugation { color: var(--accent2); font-weight: 900; font-size: clamp(0.85rem, 1.7vw, 1.15rem); line-height: 1.2; }
 
   /* ── TOP 150 TENSE TABS ── */
   #t150-tense-tabs {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     flex-wrap: nowrap;
     justify-content: center;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     flex-shrink: 0;
     width: 100%;
+    overflow: hidden;
   }
   .t150-tab {
     background: rgba(255,255,255,0.07);
@@ -602,13 +606,14 @@
     border-radius: 999px;
     color: var(--text-sub);
     font-family: 'Nunito', sans-serif;
-    font-size: clamp(0.6rem, 1.2vw, 0.78rem);
+    font-size: clamp(0.55rem, 1vw, 0.72rem);
     font-weight: 800;
-    padding: 3px 8px;
+    padding: 2px 6px;
     cursor: pointer;
     transition: all 0.18s;
     white-space: nowrap;
     flex-shrink: 1;
+    min-width: 0;
   }
   .t150-tab:hover { border-color: var(--accent3); color: var(--accent3); }
   .t150-tab.active {
