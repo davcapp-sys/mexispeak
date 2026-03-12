@@ -6282,7 +6282,7 @@ function submitTypedAnswer() {
 
   quizIdx++;
   if (isCorrect) {
-    setTimeout(() => { if (quizAnswered) quizNext(); }, accentlessMatch ? 1400 : 900);
+    setTimeout(() => { if (quizAnswered) quizNext(); }, accentlessMatch ? 3000 : 900);
   } else {
     document.getElementById('quiz-next-btn').style.display = 'inline-block';
   }
