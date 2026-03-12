@@ -58,11 +58,16 @@
   /* ── APP SHELL ── */
   #app { display: flex; flex-direction: column; width: 100%; height: 100%; }
 
-  /* Use dynamic viewport height on mobile to account for browser chrome */
+  /* Use dynamic viewport height everywhere so browser chrome never clips content */
+  /* Fallback for older Android browsers */
+  html, body, #app { height: 100vh; }
+  /* Webkit fill-available (Safari iOS fallback) */
+  @supports (-webkit-fill-available: 1px) {
+    html, body, #app { height: -webkit-fill-available; }
+  }
+  /* Modern dvh — accounts for browser chrome on all platforms */
   @supports (height: 100dvh) {
-    @media (max-width: 600px) {
-      html, body, #app { height: 100dvh; }
-    }
+    html, body, #app { height: 100dvh; }
   }
 
   /* ── TOP NAV ── */
@@ -267,7 +272,9 @@
   .flashcard {
     width: min(96%, 880px);
     flex: 1;
-    min-height: 380px;
+    min-height: 0;
+    height: clamp(220px, 42vh, 440px);
+    max-height: clamp(220px, 42vh, 440px);
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
@@ -487,7 +494,9 @@
   #t150-card {
     width: min(96%, 860px);
     flex: 1;
-    min-height: 380px;
+    min-height: 0;
+    height: clamp(220px, 42vh, 440px);
+    max-height: clamp(220px, 42vh, 440px);
     position: relative;
     cursor: pointer;
     transform-style: preserve-3d;
