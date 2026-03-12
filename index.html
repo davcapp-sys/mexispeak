@@ -5912,27 +5912,26 @@ let quizAnswered = false;
 function buildQuizDeck(deckVal) {
   const cards = [];
 
-  function addVocab(items, label) {
-    items.forEach(v => {
+  function addVocab(items, label, cat) {
+    items.forEach((v, idx) => {
       if (!v.es || !v.en) return;
-      // English → pick Spanish
       cards.push({
         label,
         question: v.en,
-        questionSub: v.ex ? `e.g. ${v.ex}` : '',
+        questionSub: v.ex ? 'e.g. ' + v.ex : '',
         answer: v.es,
-        pool: items, // for distractor generation
-        cardId: 'v_' + (v.es||'').replace(/\s+/g,'_'),
+        pool: items,
+        cardId: 'v_' + (cat||'x') + '_' + idx + '_' + (v.es||'').replace(/\s+/g,'_').slice(0,20),
         type: 'vocab'
       });
     });
   }
 
   if (deckVal === 'vocab_all') {
-    Object.entries(VOCAB).forEach(([cat, items]) => addVocab(items, 'Vocabulary'));
+    Object.entries(VOCAB).forEach(([cat, items]) => addVocab(items, 'Vocabulary', cat));
   } else if (deckVal.startsWith('vocab_')) {
     const cat = deckVal.replace('vocab_', '');
-    addVocab(VOCAB[cat] || [], 'Vocabulary — ' + cat);
+    addVocab(VOCAB[cat] || [], 'Vocabulary — ' + cat, cat);
   } else if (deckVal === 'top150') {
     TOP150.forEach(v => {
       cards.push({
@@ -5957,7 +5956,7 @@ function buildQuizDeck(deckVal) {
         cards.push({
           label: tenseNames[t] + ' — ' + pr + ' (' + prEN[pr] + ')',
           question: v.en,
-          questionSub: pr + '  (' + prEN[pr] + ')',
+          questionSub: '',
           answer: v.conj[pr],
           pool: deck.map(d => d.conj[pr]).filter(Boolean),
           cardId: 'tense_' + t + '_' + v.verb.replace(/\s+/g,'_') + '_' + pr,
