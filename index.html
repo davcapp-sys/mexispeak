@@ -5918,7 +5918,7 @@ function buildQuizDeck(deckVal) {
       cards.push({
         label,
         question: v.en,
-        questionSub: v.ex ? 'e.g. ' + v.ex : '',
+        questionSub: '→ What is this in Spanish?',
         answer: v.es,
         pool: items,
         cardId: 'v_' + (cat||'x') + '_' + idx + '_' + (v.es||'').replace(/\s+/g,'_').slice(0,20),
@@ -5971,8 +5971,8 @@ function buildQuizDeck(deckVal) {
         cards.push({
           label: '⭐ Favourite',
           question: v.frontMain,
-          questionSub: v.source || '',
-          answer: v.frontSub || v.speakText || '',
+          questionSub: '→ What is this in Spanish?',
+          answer: v.speakText || '',
           pool: favs.filter(f => f.type === 'vocab'),
           cardId: 'fav_' + (v.id||'').replace(/\s+/g,'_'),
           type: 'fav_vocab'
@@ -6205,8 +6205,11 @@ function stripAccents(str) {
 }
 
 function normaliseAnswer(str) {
+  // Strip accents, lowercase, trim
   let s = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  // Remove leading articles
   s = s.replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '');
+  // Strip ALL punctuation (¿ ? ¡ ! . , ; : etc) and collapse spaces
   s = s.replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
   return s;
 }
@@ -6218,7 +6221,15 @@ function checkTypedMatch(typed, correct) {
   let accentlessMatch = false;
   for (const v of variants) {
     const normV = normaliseAnswer(v);
-    if (typed.toLowerCase().trim() === v.toLowerCase().trim()) { exactMatch = true; break; }
+    // exactMatch: correct accents present (after stripping punctuation/articles/case)
+    const withAccents = stripAccents(v).toLowerCase().trim()
+      .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
+      .replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+    const typedWithAccents = stripAccents(typed).toLowerCase().trim()
+      .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
+      .replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+    if (typedWithAccents === withAccents) { exactMatch = true; break; }
+    // accentlessMatch: same but accents stripped on both sides
     if (normTyped === normV) accentlessMatch = true;
   }
   if (exactMatch) accentlessMatch = false;
