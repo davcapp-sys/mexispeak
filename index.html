@@ -6048,7 +6048,7 @@ function startQuiz() {
   }
 
   // Cap session at 20 cards
-  quizDeck = due.slice(0, 20);
+  quizDeck = due.slice(0, 50);
   quizIdx = 0;
   quizSessionCorrect = 0;
   quizSessionTotal = 0;
@@ -6218,25 +6218,30 @@ function normaliseAnswer(str) {
 }
 
 function checkTypedMatch(typed, correct) {
+  // Split answer on / or , to get all valid variants
   const variants = correct.split(/[\/,]/).map(v => v.trim()).filter(Boolean);
   const normTyped = normaliseAnswer(typed);
-  let exactMatch = false;
-  let accentlessMatch = false;
+
   for (const v of variants) {
     const normV = normaliseAnswer(v);
-    // exactMatch: correct accents present (after stripping punctuation/articles/case)
-    const withAccents = stripAccents(v).toLowerCase().trim()
-      .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
-      .replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
-    const typedWithAccents = stripAccents(typed).toLowerCase().trim()
-      .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
-      .replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
-    if (typedWithAccents === withAccents) { exactMatch = true; break; }
-    // accentlessMatch: same but accents stripped on both sides
-    if (normTyped === normV) accentlessMatch = true;
+
+    // Exact match: typed and correct normalise to the same string
+    // normaliseAnswer strips accents, punctuation, articles, case — so
+    // "Buenas noches" matches "buenas noches", "me llamo" matches "Me llamo" etc.
+    if (normTyped === normV) {
+      // Now check whether the user actually included the accents correctly
+      // by comparing the pre-normalised (accents kept) lowercased versions
+      const typedLower = typed.toLowerCase().trim()
+        .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
+        .replace(/[¿¡?!.,;:]/g, '').replace(/\s+/g, ' ').trim();
+      const vLower = v.toLowerCase().trim()
+        .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
+        .replace(/[¿¡?!.,;:]/g, '').replace(/\s+/g, ' ').trim();
+      const hasAccents = (typedLower === vLower);
+      return { exactMatch: hasAccents, accentlessMatch: !hasAccents, isCorrect: true };
+    }
   }
-  if (exactMatch) accentlessMatch = false;
-  return { exactMatch, accentlessMatch, isCorrect: exactMatch || accentlessMatch };
+  return { exactMatch: false, accentlessMatch: false, isCorrect: false };
 }
 
 function saveApiKey() {
@@ -6273,13 +6278,22 @@ function initClaudeKeyUI() {
 async function askClaude(question, typed, correct) {
   const key = getApiKey();
   if (!key) return null;
-  const prompt = `You are a Mexican Spanish language teacher marking a student's written answer.
+  const prompt = `You are a generous Mexican Spanish language teacher marking a beginner student's written answer. Your job is to accept any answer that would be understood and considered correct in real Mexican Spanish conversation.
 
-Question shown to student (in English): "${question}"
-Expected answer on the card: "${correct}"
-Student typed: "${typed}"
+English question shown to student: "${question}"
+Expected answer on the flashcard: "${correct}"
+Student's answer: "${typed}"
 
-Is the student's answer a valid, natural Mexican Spanish translation of the English question — even if it differs from the expected answer? Consider synonyms, regional Mexican variants, alternate phrasings, optional words (like usted), and minor grammatical variations.
+Mark the student CORRECT if their answer:
+- Is a valid Mexican Spanish translation of the English question
+- Is a common synonym or regional Mexican variant (e.g. carro/coche/auto)
+- Omits optional words like "usted" (e.g. "cómo está" is correct for "how are you formal")
+- Has a slightly different but equally valid phrasing
+- Would be understood and accepted in everyday Mexican conversation
+
+Mark WRONG only if the answer is clearly incorrect or means something different.
+
+Be generous — if in doubt, mark CORRECT.
 
 Reply with ONLY one of these two words:
 CORRECT
