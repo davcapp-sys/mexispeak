@@ -1152,9 +1152,9 @@
     /* Cards much shorter in landscape */
     .flashcard, #t150-card {
       width: min(70vw, 500px);
-      height: 44vh;
+      height: 80vh;
       min-height: 160px;
-      max-height: 220px;
+      max-height: 260px;
       flex-shrink: 0;
     }
 
@@ -1181,9 +1181,34 @@
     .t150-tab                { font-size: 0.58rem; padding: 2px 4px; }
     #t150-scene              { gap: 4px; }
     .tense-rank, #vc-rank    { font-size: 0.65rem; }
-    .verb-row    { padding: 2px 5px; }
-    .pronoun     { font-size: 0.75rem !important; min-width: 100px !important; }
-    .conjugation { font-size: 0.82rem !important; }
+    .verb-row    { padding: 1px 5px; }
+    .pronoun     { font-size: 0.72rem !important; min-width: 90px !important; }
+    .conjugation { font-size: 0.78rem !important; }
+
+    /* t150 card back — ensure all 5 rows visible without scrolling */
+    #t150-back {
+      padding: 6px 14px !important;
+      justify-content: flex-start;
+      gap: 2px;
+    }
+    #t150-verb-text {
+      font-size: clamp(1rem, 4vw, 1.4rem) !important;
+      margin-bottom: 2px !important;
+    }
+    #t150-tense-tabs {
+      gap: 2px !important;
+      margin-bottom: 2px !important;
+    }
+    .t150-tab { font-size: 0.52rem !important; padding: 1px 3px !important; }
+    #t150-conj-table { flex-shrink: 1; min-height: 0; width: 100%; }
+    #t150-conj-table .verb-row { padding: 0px 4px !important; min-height: 0; }
+    #t150-conj-table .pronoun  { font-size: 0.62rem !important; min-width: 72px !important; line-height: 1.25 !important; }
+    #t150-conj-table .conjugation { font-size: 0.68rem !important; line-height: 1.25 !important; }
+
+    /* tense card backs — ensure conjugation text fits */
+    .card-back-content { font-size: 0.85rem !important; line-height: 1.25 !important; }
+    .back-english { font-size: clamp(1rem, 4vw, 1.4rem) !important; }
+    .back-hint    { font-size: 0.65rem !important; }
   }
 </style>
 </head>
