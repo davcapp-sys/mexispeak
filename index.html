@@ -28,20 +28,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0e9aa7;
-    --card-front: #0d4d5e;
-    --card-back: #0a3f50;
+    --bg: #12b8ca;
+    --card-front: #1a6878;
+    --card-back: #155060;
     --accent1: #ff6b35;
     --accent2: #ffd700;
     --accent3: #4ecdc4;
     --accent4: #ff4757;
     --text-main: #ffffff;
     --text-sub: #c8e8ec;
-    --btn-bg: #0d4d5e;
-    --btn-hover: #0f5c70;
+    --btn-bg: #1a6878;
+    --btn-hover: #207a8c;
     --green: #2ed573;
     --purple: #a55eea;
-    --nav-bg: #0a7d89;
+    --nav-bg: #0e9fad;
     --shadow: 0 8px 32px rgba(0,0,0,0.45);
     --radius: 20px;
   }
@@ -170,7 +170,7 @@
     outline: none;
     max-width: 180px;
   }
-  #voice-select option { background: #0d4d5e; }
+  #voice-select option { background: #1a6878; }
   #speed-select {
     background: var(--btn-bg);
     border: 2px solid var(--accent2);
@@ -184,7 +184,7 @@
     outline: none;
     width: 80px;
   }
-  #speed-select option { background: #0d4d5e; }
+  #speed-select option { background: #1a6878; }
 
   /* ── MAIN AREA ── */
   #main { flex: 1; overflow: hidden; position: relative; }
@@ -264,7 +264,7 @@
     cursor: pointer;
     outline: none;
   }
-  #cat-select option, #level-select option { background: #0d4d5e; }
+  #cat-select option, #level-select option { background: #1a6878; }
   #progress-info {
     font-size: 1.15rem;
     font-weight: 800;
@@ -315,7 +315,7 @@
     text-align: center;
   }
   .card-front {
-    background: linear-gradient(135deg, #1a6878 0%, #0d4d5e 100%);
+    background: linear-gradient(135deg, #207a8c 0%, #1a6878 100%);
     border: 3px solid var(--accent1);
   }
   .tense-badge {
@@ -332,7 +332,7 @@
     flex-shrink: 0;
   }
   .card-back {
-    background: linear-gradient(135deg, #0e5868 0%, #0a4252 100%);
+    background: linear-gradient(135deg, #1a6878 0%, #125060 100%);
     border: 3px solid var(--accent3);
     transform: rotateY(180deg);
     justify-content: flex-start;
@@ -538,14 +538,14 @@
     box-shadow: 0 12px 40px rgba(0,0,0,0.6);
   }
   #t150-front {
-    background: linear-gradient(135deg, #1a6878 0%, #0d4d5e 100%);
+    background: linear-gradient(135deg, #207a8c 0%, #1a6878 100%);
     border: 3px solid var(--accent2);
     overflow: hidden;
     justify-content: space-between;
     padding: 10px 40px;
   }
   #t150-back {
-    background: linear-gradient(135deg, #0e5868 0%, #0a4252 100%);
+    background: linear-gradient(135deg, #1a6878 0%, #125060 100%);
     border: 3px solid var(--accent3);
     transform: rotateY(180deg);
     overflow: hidden;
@@ -976,11 +976,18 @@
     transition: all 0.15s;
     text-align: center;
     width: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .quiz-opt-btn:active:not(:disabled) {
+    transform: scale(0.97);
   }
   .quiz-opt-btn:hover:not(:disabled) {
     border-color: var(--accent1);
     color: var(--accent1);
     transform: scale(1.03);
+  }
+  .quiz-opt-btn:focus {
+    outline: none;
   }
 
   /* ── PHONE LAYOUT (≤600px) — iPad/desktop completely unaffected ── */
@@ -4696,7 +4703,36 @@ const TOP150_PRET = {
   'levantar':   {'yo':'levanté','tú':'levantaste','él/ella/usted':'levantó','nosotros':'levantamos','ustedes':'levantaron'},
   'importar':   {'yo':'importé','tú':'importaste','él/ella/usted':'importó','nosotros':'importamos','ustedes':'importaron'},
   'depender':   {'yo':'dependí','tú':'dependiste','él/ella/usted':'dependió','nosotros':'dependimos','ustedes':'dependieron'},
-  'repetir':    {'yo':'repetí','tú':'repetiste','él/ella/usted':'repitió','nosotros':'repetimos','ustedes':'repitieron'}
+  'repetir':    {'yo':'repetí','tú':'repetiste','él/ella/usted':'repitió','nosotros':'repetimos','ustedes':'repitieron'},
+  'aparecer':  {'yo':'aparecí','tú':'apareciste','él/ella/usted':'apareció','nosotros':'aparecimos','ustedes':'aparecieron'},
+  'aprender':  {'yo':'aprendí','tú':'aprendiste','él/ella/usted':'aprendió','nosotros':'aprendimos','ustedes':'aprendieron'},
+  'ayudar':    {'yo':'ayudé','tú':'ayudaste','él/ella/usted':'ayudó','nosotros':'ayudamos','ustedes':'ayudaron'},
+  'cambiar':   {'yo':'cambié','tú':'cambiaste','él/ella/usted':'cambió','nosotros':'cambiamos','ustedes':'cambiaron'},
+  'comenzar':  {'yo':'comencé','tú':'comenzaste','él/ella/usted':'comenzó','nosotros':'comenzamos','ustedes':'comenzaron'},
+  'comer':     {'yo':'comí','tú':'comiste','él/ella/usted':'comió','nosotros':'comimos','ustedes':'comieron'},
+  'considerar':{'yo':'consideré','tú':'consideraste','él/ella/usted':'consideró','nosotros':'consideramos','ustedes':'consideraron'},
+  'correr':    {'yo':'corrí','tú':'corriste','él/ella/usted':'corrió','nosotros':'corrimos','ustedes':'corrieron'},
+  'crear':     {'yo':'creé','tú':'creaste','él/ella/usted':'creó','nosotros':'creamos','ustedes':'crearon'},
+  'entender':  {'yo':'entendí','tú':'entendiste','él/ella/usted':'entendió','nosotros':'entendimos','ustedes':'entendieron'},
+  'escuchar':  {'yo':'escuché','tú':'escuchaste','él/ella/usted':'escuchó','nosotros':'escuchamos','ustedes':'escucharon'},
+  'existir':   {'yo':'existí','tú':'exististe','él/ella/usted':'existió','nosotros':'existimos','ustedes':'existieron'},
+  'jugar':     {'yo':'jugué','tú':'jugaste','él/ella/usted':'jugó','nosotros':'jugamos','ustedes':'jugaron'},
+  'lograr':    {'yo':'logré','tú':'lograste','él/ella/usted':'logró','nosotros':'logramos','ustedes':'lograron'},
+  'mantener':  {'yo':'mantuve','tú':'mantuviste','él/ella/usted':'mantuvo','nosotros':'mantuvimos','ustedes':'mantuvieron'},
+  'meter':     {'yo':'metí','tú':'metiste','él/ella/usted':'metió','nosotros':'metimos','ustedes':'metieron'},
+  'necesitar': {'yo':'necesité','tú':'necesitaste','él/ella/usted':'necesitó','nosotros':'necesitamos','ustedes':'necesitaron'},
+  'ocurrir':   {'yo':'ocurrí','tú':'ocurriste','él/ella/usted':'ocurrió','nosotros':'ocurrimos','ustedes':'ocurrieron'},
+  'perder':    {'yo':'perdí','tú':'perdiste','él/ella/usted':'perdió','nosotros':'perdimos','ustedes':'perdieron'},
+  'permitir':  {'yo':'permití','tú':'permitiste','él/ella/usted':'permitió','nosotros':'permitimos','ustedes':'permitieron'},
+  'preparar':  {'yo':'preparé','tú':'preparaste','él/ella/usted':'preparó','nosotros':'preparamos','ustedes':'prepararon'},
+  'presentar': {'yo':'presenté','tú':'presentaste','él/ella/usted':'presentó','nosotros':'presentamos','ustedes':'presentaron'},
+  'producir':  {'yo':'produje','tú':'produjiste','él/ella/usted':'produjo','nosotros':'produjimos','ustedes':'produjeron'},
+  'reconocer': {'yo':'reconocí','tú':'reconociste','él/ella/usted':'reconoció','nosotros':'reconocimos','ustedes':'reconocieron'},
+  'resultar':  {'yo':'resulté','tú':'resultaste','él/ella/usted':'resultó','nosotros':'resultamos','ustedes':'resultaron'},
+  'sacar':     {'yo':'saqué','tú':'sacaste','él/ella/usted':'sacó','nosotros':'sacamos','ustedes':'sacaron'},
+  'suponer':   {'yo':'supuse','tú':'supusiste','él/ella/usted':'supuso','nosotros':'supusimos','ustedes':'supusieron'},
+  'terminar':  {'yo':'terminé','tú':'terminaste','él/ella/usted':'terminó','nosotros':'terminamos','ustedes':'terminaron'},
+  'viajar':    {'yo':'viajé','tú':'viajaste','él/ella/usted':'viajó','nosotros':'viajamos','ustedes':'viajaron'}
 };
 
 // ── IMPERFECT ──
@@ -4831,7 +4867,36 @@ const TOP150_IMP = {
   'levantar':   {'yo':'levantaba','tú':'levantabas','él/ella/usted':'levantaba','nosotros':'levantábamos','ustedes':'levantaban'},
   'importar':   {'yo':'importaba','tú':'importabas','él/ella/usted':'importaba','nosotros':'importábamos','ustedes':'importaban'},
   'depender':   {'yo':'dependía','tú':'dependías','él/ella/usted':'dependía','nosotros':'dependíamos','ustedes':'dependían'},
-  'repetir':    {'yo':'repetía','tú':'repetías','él/ella/usted':'repetía','nosotros':'repetíamos','ustedes':'repetían'}
+  'repetir':    {'yo':'repetía','tú':'repetías','él/ella/usted':'repetía','nosotros':'repetíamos','ustedes':'repetían'},
+  'aparecer':  {'yo':'aparecía','tú':'aparecías','él/ella/usted':'aparecía','nosotros':'aparecíamos','ustedes':'aparecían'},
+  'aprender':  {'yo':'aprendía','tú':'aprendías','él/ella/usted':'aprendía','nosotros':'aprendíamos','ustedes':'aprendían'},
+  'ayudar':    {'yo':'ayudaba','tú':'ayudabas','él/ella/usted':'ayudaba','nosotros':'ayudábamos','ustedes':'ayudaban'},
+  'cambiar':   {'yo':'cambiaba','tú':'cambiabas','él/ella/usted':'cambiaba','nosotros':'cambiábamos','ustedes':'cambiaban'},
+  'comenzar':  {'yo':'comenzaba','tú':'comenzabas','él/ella/usted':'comenzaba','nosotros':'comenzábamos','ustedes':'comenzaban'},
+  'comer':     {'yo':'comía','tú':'comías','él/ella/usted':'comía','nosotros':'comíamos','ustedes':'comían'},
+  'considerar':{'yo':'consideraba','tú':'considerabas','él/ella/usted':'consideraba','nosotros':'considerábamos','ustedes':'consideraban'},
+  'correr':    {'yo':'corría','tú':'corrías','él/ella/usted':'corría','nosotros':'corríamos','ustedes':'corrían'},
+  'crear':     {'yo':'creaba','tú':'creabas','él/ella/usted':'creaba','nosotros':'creábamos','ustedes':'creaban'},
+  'entender':  {'yo':'entendía','tú':'entendías','él/ella/usted':'entendía','nosotros':'entendíamos','ustedes':'entendían'},
+  'escuchar':  {'yo':'escuchaba','tú':'escuchabas','él/ella/usted':'escuchaba','nosotros':'escuchábamos','ustedes':'escuchaban'},
+  'existir':   {'yo':'existía','tú':'existías','él/ella/usted':'existía','nosotros':'existíamos','ustedes':'existían'},
+  'jugar':     {'yo':'jugaba','tú':'jugabas','él/ella/usted':'jugaba','nosotros':'jugábamos','ustedes':'jugaban'},
+  'lograr':    {'yo':'lograba','tú':'lograbas','él/ella/usted':'lograba','nosotros':'lográbamos','ustedes':'lograban'},
+  'mantener':  {'yo':'mantenía','tú':'mantenías','él/ella/usted':'mantenía','nosotros':'manteníamos','ustedes':'mantenían'},
+  'meter':     {'yo':'metía','tú':'metías','él/ella/usted':'metía','nosotros':'metíamos','ustedes':'metían'},
+  'necesitar': {'yo':'necesitaba','tú':'necesitabas','él/ella/usted':'necesitaba','nosotros':'necesitábamos','ustedes':'necesitaban'},
+  'ocurrir':   {'yo':'ocurría','tú':'ocurrías','él/ella/usted':'ocurría','nosotros':'ocurríamos','ustedes':'ocurrían'},
+  'perder':    {'yo':'perdía','tú':'perdías','él/ella/usted':'perdía','nosotros':'perdíamos','ustedes':'perdían'},
+  'permitir':  {'yo':'permitía','tú':'permitías','él/ella/usted':'permitía','nosotros':'permitíamos','ustedes':'permitían'},
+  'preparar':  {'yo':'preparaba','tú':'preparabas','él/ella/usted':'preparaba','nosotros':'preparábamos','ustedes':'preparaban'},
+  'presentar': {'yo':'presentaba','tú':'presentabas','él/ella/usted':'presentaba','nosotros':'presentábamos','ustedes':'presentaban'},
+  'producir':  {'yo':'producía','tú':'producías','él/ella/usted':'producía','nosotros':'producíamos','ustedes':'producían'},
+  'reconocer': {'yo':'reconocía','tú':'reconocías','él/ella/usted':'reconocía','nosotros':'reconocíamos','ustedes':'reconocían'},
+  'resultar':  {'yo':'resultaba','tú':'resultabas','él/ella/usted':'resultaba','nosotros':'resultábamos','ustedes':'resultaban'},
+  'sacar':     {'yo':'sacaba','tú':'sacabas','él/ella/usted':'sacaba','nosotros':'sacábamos','ustedes':'sacaban'},
+  'suponer':   {'yo':'suponía','tú':'suponías','él/ella/usted':'suponía','nosotros':'suponíamos','ustedes':'suponían'},
+  'terminar':  {'yo':'terminaba','tú':'terminabas','él/ella/usted':'terminaba','nosotros':'terminábamos','ustedes':'terminaban'},
+  'viajar':    {'yo':'viajaba','tú':'viajabas','él/ella/usted':'viajaba','nosotros':'viajábamos','ustedes':'viajaban'}
 };
 
 // ── PRESENT SUBJUNCTIVE ──
@@ -4966,7 +5031,36 @@ const TOP150_SUBJ = {
   'levantar':   {'yo':'levante','tú':'levantes','él/ella/usted':'levante','nosotros':'levantemos','ustedes':'levanten'},
   'importar':   {'yo':'importe','tú':'importes','él/ella/usted':'importe','nosotros':'importemos','ustedes':'importen'},
   'depender':   {'yo':'dependa','tú':'dependas','él/ella/usted':'dependa','nosotros':'dependamos','ustedes':'dependan'},
-  'repetir':    {'yo':'repita','tú':'repitas','él/ella/usted':'repita','nosotros':'repitamos','ustedes':'repitan'}
+  'repetir':    {'yo':'repita','tú':'repitas','él/ella/usted':'repita','nosotros':'repitamos','ustedes':'repitan'},
+  'aparecer':  {'yo':'aparezca','tú':'aparezcas','él/ella/usted':'aparezca','nosotros':'aparezcamos','ustedes':'aparezcan'},
+  'aprender':  {'yo':'aprenda','tú':'aprendas','él/ella/usted':'aprenda','nosotros':'aprendamos','ustedes':'aprendan'},
+  'ayudar':    {'yo':'ayude','tú':'ayudes','él/ella/usted':'ayude','nosotros':'ayudemos','ustedes':'ayuden'},
+  'cambiar':   {'yo':'cambie','tú':'cambies','él/ella/usted':'cambie','nosotros':'cambiemos','ustedes':'cambien'},
+  'comenzar':  {'yo':'comience','tú':'comiences','él/ella/usted':'comience','nosotros':'comencemos','ustedes':'comiencen'},
+  'comer':     {'yo':'coma','tú':'comas','él/ella/usted':'coma','nosotros':'comamos','ustedes':'coman'},
+  'considerar':{'yo':'considere','tú':'consideres','él/ella/usted':'considere','nosotros':'consideremos','ustedes':'consideren'},
+  'correr':    {'yo':'corra','tú':'corras','él/ella/usted':'corra','nosotros':'corramos','ustedes':'corran'},
+  'crear':     {'yo':'cree','tú':'crees','él/ella/usted':'cree','nosotros':'creemos','ustedes':'creen'},
+  'entender':  {'yo':'entienda','tú':'entiendas','él/ella/usted':'entienda','nosotros':'entendamos','ustedes':'entiendan'},
+  'escuchar':  {'yo':'escuche','tú':'escuches','él/ella/usted':'escuche','nosotros':'escuchemos','ustedes':'escuchen'},
+  'existir':   {'yo':'exista','tú':'existas','él/ella/usted':'exista','nosotros':'existamos','ustedes':'existan'},
+  'jugar':     {'yo':'juegue','tú':'juegues','él/ella/usted':'juegue','nosotros':'juguemos','ustedes':'jueguen'},
+  'lograr':    {'yo':'logre','tú':'logres','él/ella/usted':'logre','nosotros':'logremos','ustedes':'logren'},
+  'mantener':  {'yo':'mantenga','tú':'mantengas','él/ella/usted':'mantenga','nosotros':'mantengamos','ustedes':'mantengan'},
+  'meter':     {'yo':'meta','tú':'metas','él/ella/usted':'meta','nosotros':'metamos','ustedes':'metan'},
+  'necesitar': {'yo':'necesite','tú':'necesites','él/ella/usted':'necesite','nosotros':'necesitemos','ustedes':'necesiten'},
+  'ocurrir':   {'yo':'ocurra','tú':'ocurras','él/ella/usted':'ocurra','nosotros':'ocurramos','ustedes':'ocurran'},
+  'perder':    {'yo':'pierda','tú':'pierdas','él/ella/usted':'pierda','nosotros':'perdamos','ustedes':'pierdan'},
+  'permitir':  {'yo':'permita','tú':'permitas','él/ella/usted':'permita','nosotros':'permitamos','ustedes':'permitan'},
+  'preparar':  {'yo':'prepare','tú':'prepares','él/ella/usted':'prepare','nosotros':'preparemos','ustedes':'preparen'},
+  'presentar': {'yo':'presente','tú':'presentes','él/ella/usted':'presente','nosotros':'presentemos','ustedes':'presenten'},
+  'producir':  {'yo':'produzca','tú':'produzcas','él/ella/usted':'produzca','nosotros':'produzcamos','ustedes':'produzcan'},
+  'reconocer': {'yo':'reconozca','tú':'reconozcas','él/ella/usted':'reconozca','nosotros':'reconozcamos','ustedes':'reconozcan'},
+  'resultar':  {'yo':'resulte','tú':'resultes','él/ella/usted':'resulte','nosotros':'resultemos','ustedes':'resulten'},
+  'sacar':     {'yo':'saque','tú':'saques','él/ella/usted':'saque','nosotros':'saquemos','ustedes':'saquen'},
+  'suponer':   {'yo':'suponga','tú':'supongas','él/ella/usted':'suponga','nosotros':'supongamos','ustedes':'supongan'},
+  'terminar':  {'yo':'termine','tú':'termines','él/ella/usted':'termine','nosotros':'terminemos','ustedes':'terminen'},
+  'viajar':    {'yo':'viaje','tú':'viajes','él/ella/usted':'viaje','nosotros':'viajemos','ustedes':'viajen'}
 };
 
 // ── CONDITIONAL ──
@@ -5101,7 +5195,36 @@ const TOP150_COND = {
   'levantar':   {'yo':'levantaría','tú':'levantarías','él/ella/usted':'levantaría','nosotros':'levantaríamos','ustedes':'levantarían'},
   'importar':   {'yo':'importaría','tú':'importarías','él/ella/usted':'importaría','nosotros':'importaríamos','ustedes':'importarían'},
   'depender':   {'yo':'dependería','tú':'dependerías','él/ella/usted':'dependería','nosotros':'dependeríamos','ustedes':'dependerían'},
-  'repetir':    {'yo':'repetiría','tú':'repetirías','él/ella/usted':'repetiría','nosotros':'repetiríamos','ustedes':'repetirían'}
+  'repetir':    {'yo':'repetiría','tú':'repetirías','él/ella/usted':'repetiría','nosotros':'repetiríamos','ustedes':'repetirían'},
+  'aparecer':  {'yo':'aparecería','tú':'aparecerías','él/ella/usted':'aparecería','nosotros':'apareceríamos','ustedes':'aparecerían'},
+  'aprender':  {'yo':'aprendería','tú':'aprenderías','él/ella/usted':'aprendería','nosotros':'aprenderíamos','ustedes':'aprenderían'},
+  'ayudar':    {'yo':'ayudaría','tú':'ayudarías','él/ella/usted':'ayudaría','nosotros':'ayudaríamos','ustedes':'ayudarían'},
+  'cambiar':   {'yo':'cambiaría','tú':'cambiarías','él/ella/usted':'cambiaría','nosotros':'cambiaríamos','ustedes':'cambiarían'},
+  'comenzar':  {'yo':'comenzaría','tú':'comenzarías','él/ella/usted':'comenzaría','nosotros':'comenzaríamos','ustedes':'comenzarían'},
+  'comer':     {'yo':'comería','tú':'comerías','él/ella/usted':'comería','nosotros':'comeríamos','ustedes':'comerían'},
+  'considerar':{'yo':'consideraría','tú':'considerarías','él/ella/usted':'consideraría','nosotros':'consideraríamos','ustedes':'considerarían'},
+  'correr':    {'yo':'correría','tú':'correrías','él/ella/usted':'correría','nosotros':'correríamos','ustedes':'correrían'},
+  'crear':     {'yo':'crearía','tú':'crearías','él/ella/usted':'crearía','nosotros':'crearíamos','ustedes':'crearían'},
+  'entender':  {'yo':'entendería','tú':'entenderías','él/ella/usted':'entendería','nosotros':'entenderíamos','ustedes':'entenderían'},
+  'escuchar':  {'yo':'escucharía','tú':'escucharías','él/ella/usted':'escucharía','nosotros':'escucharíamos','ustedes':'escucharían'},
+  'existir':   {'yo':'existiría','tú':'existirías','él/ella/usted':'existiría','nosotros':'existiríamos','ustedes':'existirían'},
+  'jugar':     {'yo':'jugaría','tú':'jugarías','él/ella/usted':'jugaría','nosotros':'jugaríamos','ustedes':'jugarían'},
+  'lograr':    {'yo':'lograría','tú':'lograrías','él/ella/usted':'lograría','nosotros':'lograríamos','ustedes':'lograrían'},
+  'mantener':  {'yo':'mantendría','tú':'mantendrías','él/ella/usted':'mantendría','nosotros':'mantendríamos','ustedes':'mantendrían'},
+  'meter':     {'yo':'metería','tú':'meterías','él/ella/usted':'metería','nosotros':'meteríamos','ustedes':'meterían'},
+  'necesitar': {'yo':'necesitaría','tú':'necesitarías','él/ella/usted':'necesitaría','nosotros':'necesitaríamos','ustedes':'necesitarían'},
+  'ocurrir':   {'yo':'ocurriría','tú':'ocurrirías','él/ella/usted':'ocurriría','nosotros':'ocurriríamos','ustedes':'ocurrirían'},
+  'perder':    {'yo':'perdería','tú':'perderías','él/ella/usted':'perdería','nosotros':'perderíamos','ustedes':'perderían'},
+  'permitir':  {'yo':'permitiría','tú':'permitirías','él/ella/usted':'permitiría','nosotros':'permitiríamos','ustedes':'permitirían'},
+  'preparar':  {'yo':'prepararía','tú':'prepararías','él/ella/usted':'prepararía','nosotros':'prepararíamos','ustedes':'prepararían'},
+  'presentar': {'yo':'presentaría','tú':'presentarías','él/ella/usted':'presentaría','nosotros':'presentaríamos','ustedes':'presentarían'},
+  'producir':  {'yo':'produciría','tú':'producirías','él/ella/usted':'produciría','nosotros':'produciríamos','ustedes':'producirían'},
+  'reconocer': {'yo':'reconocería','tú':'reconocerías','él/ella/usted':'reconocería','nosotros':'reconoceríamos','ustedes':'reconocerían'},
+  'resultar':  {'yo':'resultaría','tú':'resultarías','él/ella/usted':'resultaría','nosotros':'resultaríamos','ustedes':'resultarían'},
+  'sacar':     {'yo':'sacaría','tú':'sacarías','él/ella/usted':'sacaría','nosotros':'sacaríamos','ustedes':'sacarían'},
+  'suponer':   {'yo':'supondría','tú':'supondrías','él/ella/usted':'supondría','nosotros':'supondríamos','ustedes':'supondrían'},
+  'terminar':  {'yo':'terminaría','tú':'terminarías','él/ella/usted':'terminaría','nosotros':'terminaríamos','ustedes':'terminarían'},
+  'viajar':    {'yo':'viajaría','tú':'viajarías','él/ella/usted':'viajaría','nosotros':'viajaríamos','ustedes':'viajarían'}
 };
 
 function initTop150() {
