@@ -29,16 +29,16 @@
 <style>
   :root {
     --bg: #0e9aa7;
-    --card-front: #0a2a35;
-    --card-back: #062030;
+    --card-front: #0d4d5e;
+    --card-back: #0a3f50;
     --accent1: #ff6b35;
     --accent2: #ffd700;
     --accent3: #4ecdc4;
     --accent4: #ff4757;
     --text-main: #ffffff;
     --text-sub: #c8e8ec;
-    --btn-bg: #0b2530;
-    --btn-hover: #0e3340;
+    --btn-bg: #0d4d5e;
+    --btn-hover: #0f5c70;
     --green: #2ed573;
     --purple: #a55eea;
     --nav-bg: #0a7d89;
@@ -108,6 +108,24 @@
     color: var(--accent1);
     background: rgba(255,107,53,0.12);
   }
+  .nav-btn-quiz {
+    background: #c0392b !important;
+    border-color: #e74c3c !important;
+    color: #fff !important;
+  }
+  .nav-btn-quiz:hover {
+    background: #e74c3c !important;
+    color: #fff !important;
+  }
+  .nav-btn-quiz.active {
+    background: #e74c3c !important;
+    border-color: #ff6b6b !important;
+    color: #fff !important;
+  }
+  .quiz-brain {
+    display: inline-block;
+    filter: hue-rotate(160deg) saturate(0.6) brightness(1.4);
+  }
   .level-badge {
     font-size: 0.75rem;
     padding: 3px 8px;
@@ -152,7 +170,7 @@
     outline: none;
     max-width: 180px;
   }
-  #voice-select option { background: #0a2a35; }
+  #voice-select option { background: #0d4d5e; }
   #speed-select {
     background: var(--btn-bg);
     border: 2px solid var(--accent2);
@@ -166,7 +184,7 @@
     outline: none;
     width: 80px;
   }
-  #speed-select option { background: #0a2a35; }
+  #speed-select option { background: #0d4d5e; }
 
   /* ── MAIN AREA ── */
   #main { flex: 1; overflow: hidden; position: relative; }
@@ -246,7 +264,7 @@
     cursor: pointer;
     outline: none;
   }
-  #cat-select option, #level-select option { background: #0a2a35; }
+  #cat-select option, #level-select option { background: #0d4d5e; }
   #progress-info {
     font-size: 1.15rem;
     font-weight: 800;
@@ -297,7 +315,7 @@
     text-align: center;
   }
   .card-front {
-    background: linear-gradient(135deg, #0d3545 0%, #082838 100%);
+    background: linear-gradient(135deg, #1a6878 0%, #0d4d5e 100%);
     border: 3px solid var(--accent1);
   }
   .tense-badge {
@@ -314,7 +332,7 @@
     flex-shrink: 0;
   }
   .card-back {
-    background: linear-gradient(135deg, #072535 0%, #051a28 100%);
+    background: linear-gradient(135deg, #0e5868 0%, #0a4252 100%);
     border: 3px solid var(--accent3);
     transform: rotateY(180deg);
     justify-content: flex-start;
@@ -520,14 +538,14 @@
     box-shadow: 0 12px 40px rgba(0,0,0,0.6);
   }
   #t150-front {
-    background: linear-gradient(135deg, #0c3040 0%, #082535 100%);
+    background: linear-gradient(135deg, #1a6878 0%, #0d4d5e 100%);
     border: 3px solid var(--accent2);
     overflow: hidden;
     justify-content: space-between;
     padding: 10px 40px;
   }
   #t150-back {
-    background: linear-gradient(135deg, #072535 0%, #051a28 100%);
+    background: linear-gradient(135deg, #0e5868 0%, #0a4252 100%);
     border: 3px solid var(--accent3);
     transform: rotateY(180deg);
     overflow: hidden;
@@ -1184,7 +1202,7 @@
       <button class="nav-btn" onclick="showScreen('cond')">↔ Conditional</button>
       <button class="nav-btn" onclick="showScreen('vocab')">💬 Vocabulary</button>
       <button class="nav-btn" onclick="showScreen('favs')">⭐ Favourites</button>
-      <button class="nav-btn" onclick="showScreen('quiz')">🧠 Quiz</button>
+      <button class="nav-btn nav-btn-quiz" onclick="showScreen('quiz')"><span class="quiz-brain">🧠</span> Quiz</button>
     </div>
   </nav>
 
