@@ -6038,7 +6038,7 @@ function showQuizCard() {
     optDiv.style.display = 'none';
     typeWrap.classList.add('visible');
     typeInp.value = '';
-    typeInp.className = '';
+    typeInp.className = ''; typeInp.style.transition = 'none'; typeInp.style.borderColor = ''; typeInp.style.background = ''; requestAnimationFrame(() => { typeInp.style.transition = ''; });
     document.getElementById('quiz-submit-btn').disabled = false;
     setTimeout(() => typeInp.focus(), 80);
   } else {
@@ -6153,7 +6153,7 @@ function selectQuizAnswer(btn, chosen, correct) {
 function quizNext() {
   quizAnswered = false;
   const inp = document.getElementById('quiz-type-input');
-  if (inp) { inp.value = ''; inp.className = ''; }
+  if (inp) { inp.value = ''; inp.className = ''; inp.style.transition = 'none'; inp.style.borderColor = ''; inp.style.background = ''; requestAnimationFrame(() => { inp.style.transition = ''; }); }
   document.getElementById('quiz-feedback').textContent = '';
   document.getElementById('quiz-next-btn').style.display = 'none';
   showQuizCard();
@@ -6405,6 +6405,85 @@ function resetQuizProgress() {
   showToast('Progress reset');
 }
 
+
+// ── SWIPE GESTURES ──────────────────────────────────────────
+// Swipe right = next card, swipe left = prev card, swipe up/down = flip
+// Applied to all flashcard elements across all screens
+
+(function() {
+  const MIN_SWIPE = 40;   // minimum px to count as a swipe
+  const MAX_PERP  = 80;   // max perpendicular movement (prevents diagonal misfire)
+
+  function addSwipe(el, onNext, onPrev, onFlip) {
+    if (!el) return;
+    let x0 = null, y0 = null;
+
+    el.addEventListener('touchstart', function(e) {
+      const t = e.changedTouches[0];
+      x0 = t.clientX;
+      y0 = t.clientY;
+    }, { passive: true });
+
+    el.addEventListener('touchend', function(e) {
+      if (x0 === null) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      x0 = null; y0 = null;
+
+      // Horizontal swipe
+      if (adx >= MIN_SWIPE && ady <= MAX_PERP) {
+        e.preventDefault();
+        if (dx > 0) onPrev(); else onNext();
+        return;
+      }
+      // Vertical swipe
+      if (ady >= MIN_SWIPE && adx <= MAX_PERP) {
+        e.preventDefault();
+        onFlip();
+      }
+    }, { passive: false });
+  }
+
+  // Wait for DOM ready then attach
+  function attachAll() {
+    // Top 150 Verbs
+    addSwipe(
+      document.getElementById('t150-card'),
+      nextTop150, prevTop150, flipTop150
+    );
+
+    // Vocabulary
+    addSwipe(
+      document.getElementById('vocab-card'),
+      nextVocabCard, prevVocabCard, flipVocabCard
+    );
+
+    // Favourites
+    addSwipe(
+      document.getElementById('fav-card'),
+      nextFav, prevFav, flipFavCard
+    );
+
+    // Tense screens — each card gets its tense passed in
+    ['pret','imp','subj','cond'].forEach(function(t) {
+      addSwipe(
+        document.getElementById(t + '-card'),
+        function() { nextTenseCard(t); },
+        function() { prevTenseCard(t); },
+        function() { flipTenseCard(t); }
+      );
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachAll);
+  } else {
+    attachAll();
+  }
+})();
 </script>
 </body>
 </html>
