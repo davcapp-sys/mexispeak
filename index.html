@@ -1145,16 +1145,16 @@
       flex-direction: column;
       align-items: center;
     }
-    .screen-tense { overflow: hidden; padding: 4px 8px 6px; gap: 3px; }
+    .screen-tense { overflow: hidden; padding: 4px 8px 2px; gap: 3px; }
     #screen-vocab, #screen-favs { padding: 6px 8px 16px; gap: 5px; }
     #screen-top150 { padding: 2px 0 12px; }
 
-    /* Cards in landscape — must leave room for nav above and buttons below */
+    /* Cards in landscape — flex:1 fills available space, max-height prevents overflow */
     .flashcard, #t150-card {
-      width: min(60vw, 420px);
+      width: min(62vw, 440px);
       height: auto;
       min-height: 0;
-      max-height: 52vh;
+      max-height: 70vh;
       flex-shrink: 1;
       flex: 1;
     }
@@ -1183,7 +1183,7 @@
     #vocab-cat-select        { font-size: 0.7rem; padding: 4px 6px; }
     .t150-tab                { font-size: 0.58rem; padding: 2px 4px; }
     #t150-scene              { gap: 3px; padding: 0 2px; }
-    #screen-top150           { padding: 1px 0 4px; gap: 2px; }
+    #screen-top150           { padding: 1px 0 2px; gap: 2px; }
     #top150-btns             { gap: 4px; padding-bottom: 2px; }
     #top150-btns .ans-btn, #top150-btns .fav-btn, #top150-btns .speak-btn { font-size: 0.6rem !important; padding: 4px 7px !important; }
     .tense-rank, #vc-rank    { font-size: 0.65rem; }
