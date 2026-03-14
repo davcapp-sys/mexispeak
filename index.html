@@ -1145,7 +1145,7 @@
       flex-direction: column;
       align-items: center;
     }
-    .screen-tense { overflow: hidden; padding: 4px 8px 16px; gap: 4px; }
+    .screen-tense { overflow: hidden; padding: 4px 8px 6px; gap: 3px; }
     #screen-vocab, #screen-favs { padding: 6px 8px 16px; gap: 5px; }
     #screen-top150 { padding: 2px 0 12px; }
 
@@ -1174,23 +1174,30 @@
     .fav-btn, .speak-btn { width: 30px; height: 30px; font-size: 0.85rem; }
 
     /* Headers */
-    .tense-screen-header h2 { font-size: 0.9rem; }
-    #top150-header h2        { font-size: 0.9rem; }
-    #top150-header           { padding: 3px 8px 2px; }
+    .tense-screen-header h2 { font-size: 0.82rem; }
+    #top150-header h2        { font-size: 0.75rem; }
+    #top150-header           { padding: 2px 6px 1px; gap: 4px; flex-wrap: nowrap; }
+    .mode-btn                { font-size: 0.6rem !important; padding: 3px 6px !important; }
+    #top150-progress         { font-size: 0.7rem !important; }
     #vocab-header            { gap: 4px; }
     #vocab-cat-select        { font-size: 0.7rem; padding: 4px 6px; }
     .t150-tab                { font-size: 0.58rem; padding: 2px 4px; }
-    #t150-scene              { gap: 4px; }
+    #t150-scene              { gap: 3px; padding: 0 2px; }
+    #screen-top150           { padding: 1px 0 4px; gap: 2px; }
+    #top150-btns             { gap: 4px; padding-bottom: 2px; }
+    #top150-btns .ans-btn, #top150-btns .fav-btn, #top150-btns .speak-btn { font-size: 0.6rem !important; padding: 4px 7px !important; }
     .tense-rank, #vc-rank    { font-size: 0.65rem; }
     .verb-row    { padding: 1px 5px; }
     .pronoun     { font-size: 0.72rem !important; min-width: 90px !important; }
     .conjugation { font-size: 0.78rem !important; }
 
-    /* t150 card back — ensure all 5 rows visible without scrolling */
+    /* t150 card back — scrollable in landscape */
     #t150-back {
       padding: 4px 10px !important;
       justify-content: flex-start;
       gap: 1px;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
     }
     #t150-verb-text {
       font-size: clamp(0.9rem, 3.5vw, 1.2rem) !important;
@@ -1206,8 +1213,9 @@
     #t150-conj-table .pronoun  { font-size: 0.60rem !important; min-width: 70px !important; line-height: 1 !important; }
     #t150-conj-table .conjugation { font-size: 0.66rem !important; line-height: 1 !important; }
 
-    /* tense card backs — ensure conjugation text fits */
-    .card-back-content { font-size: 0.85rem !important; line-height: 1.25 !important; }
+    /* tense card backs — scrollable in landscape */
+    .card-back-content { font-size: 0.85rem !important; line-height: 1.25 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
+    .tense-back { overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
     .back-english { font-size: clamp(1rem, 4vw, 1.4rem) !important; }
     .back-hint    { font-size: 0.65rem !important; }
   }
@@ -1351,11 +1359,11 @@
           <div id="t150-back">
             <div id="t150-verb-text">ser</div>
             <div id="t150-tense-tabs">
-              <button class="t150-tab active" onclick="switchT150Tab('present',this)">Present</button>
-              <button class="t150-tab" onclick="switchT150Tab('pret',this)">Pretérito</button>
-              <button class="t150-tab" onclick="switchT150Tab('imp',this)">Imperfect</button>
-              <button class="t150-tab" onclick="switchT150Tab('subj',this)">Subjunctive</button>
-              <button class="t150-tab" onclick="switchT150Tab('cond',this)">Conditional</button>
+              <button class="t150-tab active" onclick="switchT150Tab('present',this)">Pres</button>
+              <button class="t150-tab" onclick="switchT150Tab('pret',this)">Pret</button>
+              <button class="t150-tab" onclick="switchT150Tab('imp',this)">Imp</button>
+              <button class="t150-tab" onclick="switchT150Tab('subj',this)">Subj</button>
+              <button class="t150-tab" onclick="switchT150Tab('cond',this)">Cond</button>
             </div>
             <div id="t150-conj-table"></div>
           </div>
