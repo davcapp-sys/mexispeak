@@ -1149,14 +1149,15 @@
     #screen-vocab, #screen-favs { padding: 6px 8px 16px; gap: 5px; }
     #screen-top150 { padding: 2px 0 12px; }
 
-    /* Cards in landscape — flex:1 fills available space, max-height prevents overflow */
+    /* Cards in landscape — fill all available vertical space */
     .flashcard, #t150-card {
       width: min(62vw, 440px);
-      height: auto;
-      min-height: 0;
-      max-height: 70vh;
+      height: 100%;
+      min-height: 60px;
+      max-height: 72vh;
       flex-shrink: 1;
       flex: 1;
+      align-self: stretch;
     }
 
     /* Smaller text */
