@@ -4125,6 +4125,16 @@ function resetVocabDeck() {
 }
 function shuffleVocabDeck() { vocabDeck = shuffle([...vocabDeck]); vocabIdx = 0; showVocabCard(); showToast('🔀 Shuffled!'); }
 function showVocabCard() {
+  // Skip retired cards
+  let skips = 0;
+  while (skips < vocabDeck.length && typeof isRetired === 'function') {
+    const v = vocabDeck[vocabIdx];
+    if (!v) break;
+    const cat = document.getElementById('vocab-cat-select')?.value || '';
+    if (!isRetired('retire_vocab_' + cat + '_' + v.rank)) break;
+    vocabIdx = (vocabIdx + 1) % vocabDeck.length;
+    skips++;
+  }
   vocabFlipped = false;
   document.getElementById('vocab-card').classList.remove('flipped');
   const v = vocabDeck[vocabIdx];
@@ -5025,6 +5035,14 @@ function buildConjPhrases(verb, tense) {
 }
 
 function showTop150Card() {
+  // Skip retired cards
+  let skips = 0;
+  while (skips < top150Deck.length && typeof isRetired === 'function') {
+    const v = top150Deck[top150Idx];
+    if (!v || !isRetired('retire_t150_' + v.verb.replace(/\s+/g,'_'))) break;
+    top150Idx = (top150Idx + 1) % top150Deck.length;
+    skips++;
+  }
   top150Flipped = false;
   top150ActiveTense = 'present';
   const card = document.getElementById('t150-card');
@@ -5402,6 +5420,17 @@ function enForTense(rawEn, tense) {
 }
 
 function showTenseCard(t) {
+  // Skip retired cards
+  const s0 = tenseDeckState[t];
+  if (s0 && typeof isRetired === 'function') {
+    let skips = 0;
+    while (skips < s0.deck.length) {
+      const v = s0.deck[s0.idx];
+      if (!v || !isRetired('retire_tense_' + t + '_' + v.verb.replace(/\s+/g,'_'))) break;
+      s0.idx = (s0.idx + 1) % s0.deck.length;
+      skips++;
+    }
+  }
   const s = tenseDeckState[t];
   s.flipped = false;
   const card = document.getElementById(t + '-card');
@@ -5871,7 +5900,7 @@ function selfAssess(screen, correct) {
   let deckKey, cardId;
   if (screen === 'vocab') {
     const card = vocabDeck[vocabIdx];
-    deckKey = 'vocab_' + currentVocabCategory;
+    deckKey = 'vocab_' + document.getElementById('vocab-cat-select').value;
     cardId = card ? card.rank + '_' + card.es : String(vocabIdx);
   } else if (screen === 't150') {
     const card = top150Deck[top150Idx];
@@ -5922,6 +5951,7 @@ function buildQuizDeck(deckVal) {
   function addVocab(items, label, cat) {
     items.forEach((v, idx) => {
       if (!v.es || !v.en) return;
+      if (typeof isRetired === 'function' && isRetired('retire_vocab_' + cat + '_' + v.rank)) return;
       cards.push({
         label,
         question: v.en,
@@ -5941,6 +5971,7 @@ function buildQuizDeck(deckVal) {
     addVocab(VOCAB[cat] || [], 'Vocabulary — ' + cat, cat);
   } else if (deckVal === 'top150') {
     TOP150.forEach(v => {
+      if (typeof isRetired === 'function' && isRetired('retire_t150_' + v.verb.replace(/\s+/g,'_'))) return;
       cards.push({
         label: 'Top 150 Verbs',
         question: v.en,
@@ -5954,7 +5985,7 @@ function buildQuizDeck(deckVal) {
   } else if (deckVal.startsWith('tense_')) {
     const t = deckVal.replace('tense_', '');
     const tenseNames = {pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional'};
-    const deck = TENSE_DECKS[t] || [];
+    const deck = (TENSE_DECKS[t] || []).filter(v => typeof isRetired !== 'function' || !isRetired('retire_tense_' + t + '_' + v.verb.replace(/\s+/g,'_')));
     const pronouns = ['yo','tú','él/ella/usted','nosotros','ustedes'];
     const prEN = {'yo':'I','tú':'you','él/ella/usted':'he/she/you','nosotros':'we','ustedes':'you all'};
     deck.forEach(v => {
@@ -6735,82 +6766,12 @@ function clearAllMastered() {
   showToast('↩️ All cards restored to rotation');
 }
 
-// Hook into buildQuizDeck to filter retired cards
-const _origBuildQuizDeck = buildQuizDeck;
-buildQuizDeck = function(deckVal) {
-  const cards = _origBuildQuizDeck(deckVal);
-  return cards.filter(c => {
-    // Translate quiz cardId to retire ID format
-    let retireId = null;
-    if (c.type === 'vocab') {
-      // cardId = 'v_cat_idx_es_prefix' — extract cat and match by es
-      const parts = c.cardId.split('_');
-      const cat = parts[1] || '';
-      // Find rank from VOCAB
-      const esPrefix = parts.slice(3).join('_');
-      const vocabArr = VOCAB[cat] || [];
-      const match = vocabArr.find(v => (v.es||'').replace(/\s+/g,'_').slice(0,20) === esPrefix);
-      if (match) retireId = 'retire_vocab_' + cat + '_' + match.rank;
-    } else if (c.type === 'top150') {
-      // cardId = 't150_verb'
-      const verb = c.cardId.replace('t150_','');
-      retireId = 'retire_t150_' + verb;
-    } else if (c.type === 'tense') {
-      // cardId = 'tense_t_verb_pronoun'
-      const parts = c.cardId.split('_');
-      const t = parts[1];
-      const verb = parts[2];
-      retireId = 'retire_tense_' + t + '_' + verb;
-    }
-    return !retireId || !isRetired(retireId);
-  });
-};
+// quiz retired-card filtering handled in buildQuizDeck directly
 
 // Hook into showTop150Card to skip retired
-function _t150RetireId() {
-  const v = top150Deck[top150Idx];
-  return v ? 'retire_t150_' + v.verb.replace(/\s+/g,'_') : null;
-}
-function _vocabRetireId() {
-  const v = vocabDeck[vocabIdx];
-  if (!v) return null;
-  const cat = document.getElementById('vocab-cat-select').value;
-  return 'retire_vocab_' + cat + '_' + v.rank;
-}
+// nav skip-retired handled inside showTop150Card and showVocabCard
 
-const _origNextTop150 = nextTop150;
-nextTop150 = function() {
-  _origNextTop150();
-  let tries = 0;
-  while (isRetired(_t150RetireId()) && tries++ < top150Deck.length) _origNextTop150();
-};
-const _origPrevTop150 = prevTop150;
-prevTop150 = function() {
-  _origPrevTop150();
-  let tries = 0;
-  while (isRetired(_t150RetireId()) && tries++ < top150Deck.length) _origPrevTop150();
-};
 
-const _origNextVocab = nextVocabCard;
-nextVocabCard = function() {
-  _origNextVocab();
-  let tries = 0;
-  while (isRetired(_vocabRetireId()) && tries++ < vocabDeck.length) _origNextVocab();
-};
-const _origPrevVocab = prevVocabCard;
-prevVocabCard = function() {
-  _origPrevVocab();
-  let tries = 0;
-  while (isRetired(_vocabRetireId()) && tries++ < vocabDeck.length) _origPrevVocab();
-};
-
-// Hook tense navigation to skip retired cards
-['pret','imp','subj','cond'].forEach(function(t) {
-  const origNext = nextTenseCard;
-  const origPrev = prevTenseCard;
-  // We wrap at the call level in toggleRetire's setTimeout instead
-  // so no need to re-wrap here — toggleRetire auto-advances already
-});
 
 // Init mastered on load
 document.addEventListener('DOMContentLoaded', function() {
