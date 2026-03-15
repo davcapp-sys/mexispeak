@@ -5633,6 +5633,11 @@ const PAST_IRREGULAR = {
 };
 
 function enForTense(rawEn, tense) {
+  // For present and future, preserve parentheticals (e.g. 'to be (permanent)' vs 'to be (state)')
+  if (tense === 'pres' || tense === 'fut') {
+    // Just strip leading 'to ' for cleaner display
+    return rawEn.replace(/^to\s+/i, '').trim();
+  }
   // Strip parenthetical notes like "(regular -AR)", "(e→i)", "(vendr-)" etc.
   // Keep the core meaning only
   // Strip parenthetical notes first
