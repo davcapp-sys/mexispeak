@@ -4123,6 +4123,16 @@ function resetVocabDeck() {
   vocabDeck = [...getVocabDeck()];
   vocabIdx = 0;
   if (vocabDeck.length === 0) vocabDeck = [{es:'(no cards)',en:'Try a different filter',ex:'',note:'',rank:0}];
+  // Start on first non-retired card
+  if (typeof isRetired === 'function') {
+    var cat = document.getElementById('vocab-cat-select').value;
+    for (var i = 0; i < vocabDeck.length; i++) {
+      if (!isRetired('retire_vocab_' + cat + '_' + vocabDeck[i].rank)) {
+        vocabIdx = i;
+        break;
+      }
+    }
+  }
   showVocabCard();
 }
 function shuffleVocabDeck() { vocabDeck = shuffle([...vocabDeck]); vocabIdx = 0; showVocabCard(); showToast('🔀 Shuffled!'); }
@@ -4981,6 +4991,13 @@ function initTop150() {
   top150Deck = [...TOP150];
   top150Idx = 0;
   top150Flipped = false;
+  if (typeof isRetired === 'function') {
+    for (var i = 0; i < top150Deck.length; i++) {
+      if (!isRetired('retire_t150_' + top150Deck[i].verb.replace(/\s+/g,'_'))) {
+        top150Idx = i; break;
+      }
+    }
+  }
   buildVerbTable();
   showTop150Card();
 }
@@ -5261,6 +5278,13 @@ function initTenseScreen(t) {
   s.deck = [...TENSE_DECKS[t]];
   s.idx = 0;
   s.flipped = false;
+  if (typeof isRetired === 'function') {
+    for (var i = 0; i < s.deck.length; i++) {
+      if (!isRetired('retire_tense_' + t + '_' + s.deck[i].verb.replace(/\s+/g,'_'))) {
+        s.idx = i; break;
+      }
+    }
+  }
   showTenseCard(t);
 }
 
