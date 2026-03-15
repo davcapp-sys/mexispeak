@@ -1082,12 +1082,12 @@
     .ans-shuffle     { padding: 8px 11px; }
     .ans-flip        { padding: 8px 11px; }
     .retire-btn {
-    width: 52px; height: 52px;
+    width: 60px; height: 60px;
     border-radius: 50%;
     border: 2px solid var(--accent1);
     background: rgba(255,107,53,0.12);
     color: var(--accent1);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     cursor: pointer;
     transition: all 0.18s;
     display: flex; align-items: center; justify-content: center;
@@ -1188,12 +1188,12 @@
     #answer-btns, .answer-btns { gap: 5px; flex-wrap: nowrap; }
     .ans-btn  { font-size: 0.72rem; padding: 6px 9px; }
     .retire-btn {
-    width: 52px; height: 52px;
+    width: 60px; height: 60px;
     border-radius: 50%;
     border: 2px solid var(--accent1);
     background: rgba(255,107,53,0.12);
     color: var(--accent1);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     cursor: pointer;
     transition: all 0.18s;
     display: flex; align-items: center; justify-content: center;
@@ -6602,7 +6602,9 @@ function getCurrentRetireId(type) {
 function getCurrentRetireLabel(type) {
   if (type === 'vocab') {
     const v = vocabDeck[vocabIdx];
-    return { text: v?.es, source: currentVocabCategory, type: 'vocab' };
+    const sel = document.getElementById('vocab-cat-select');
+    const catLabel = sel ? sel.options[sel.selectedIndex]?.text : 'Vocabulary';
+    return { text: v?.es, source: catLabel, type: 'vocab' };
   }
   if (type === 't150') {
     const v = top150Deck[top150Idx];
@@ -6634,7 +6636,7 @@ function toggleRetire(type) {
     const info = getCurrentRetireLabel(type);
     mastered.push({ id, text: info?.text || id, source: info?.source || type, type: info?.type || type, retiredAt: Date.now() });
     saveMastered();
-    showToast('🔥 Mastered — removed from rotation');
+    showToast('🔥 Mastered! (' + mastered.length + ' total)');
     // Auto-advance to next card
     setTimeout(() => {
       if (type === 'vocab')   nextVocabCard();
