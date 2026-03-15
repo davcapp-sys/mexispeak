@@ -4152,11 +4152,23 @@ function flipVocabCard() {
   document.getElementById('vocab-card').classList.toggle('flipped', vocabFlipped);
 }
 function nextVocabCard() {
-  vocabIdx = (vocabIdx + 1) % vocabDeck.length;
+  var start = vocabIdx;
+  do {
+    vocabIdx = (vocabIdx + 1) % vocabDeck.length;
+    var v = vocabDeck[vocabIdx];
+    var cat = document.getElementById('vocab-cat-select').value;
+    if (!isRetired('retire_vocab_' + cat + '_' + v.rank)) break;
+  } while (vocabIdx !== start);
   showVocabCard();
 }
 function prevVocabCard() {
-  vocabIdx = (vocabIdx - 1 + vocabDeck.length) % vocabDeck.length;
+  var start = vocabIdx;
+  do {
+    vocabIdx = (vocabIdx - 1 + vocabDeck.length) % vocabDeck.length;
+    var v = vocabDeck[vocabIdx];
+    var cat = document.getElementById('vocab-cat-select').value;
+    if (!isRetired('retire_vocab_' + cat + '_' + v.rank)) break;
+  } while (vocabIdx !== start);
   showVocabCard();
 }
 // ══════════════════════════════════════════════
@@ -5052,11 +5064,21 @@ function flipTop150() {
   document.getElementById('top150-btns').classList.toggle('card-flipped', top150Flipped);
 }
 function nextTop150() {
-  top150Idx = (top150Idx + 1) % top150Deck.length;
+  var start = top150Idx;
+  do {
+    top150Idx = (top150Idx + 1) % top150Deck.length;
+    var v = top150Deck[top150Idx];
+    if (!isRetired('retire_t150_' + v.verb.replace(/\s+/g,'_'))) break;
+  } while (top150Idx !== start);
   showTop150Card();
 }
 function prevTop150() {
-  top150Idx = (top150Idx - 1 + top150Deck.length) % top150Deck.length;
+  var start = top150Idx;
+  do {
+    top150Idx = (top150Idx - 1 + top150Deck.length) % top150Deck.length;
+    var v = top150Deck[top150Idx];
+    if (!isRetired('retire_t150_' + v.verb.replace(/\s+/g,'_'))) break;
+  } while (top150Idx !== start);
   showTop150Card();
 }
 function shuffleTop150() {
@@ -5452,13 +5474,23 @@ function flipTenseCard(t) {
 
 function nextTenseCard(t) {
   const s = tenseDeckState[t];
-  s.idx = (s.idx + 1) % s.deck.length;
+  var start = s.idx;
+  do {
+    s.idx = (s.idx + 1) % s.deck.length;
+    var v = s.deck[s.idx];
+    if (!isRetired('retire_tense_' + t + '_' + v.verb.replace(/\s+/g,'_'))) break;
+  } while (s.idx !== start);
   showTenseCard(t);
 }
 
 function prevTenseCard(t) {
   const s = tenseDeckState[t];
-  s.idx = (s.idx - 1 + s.deck.length) % s.deck.length;
+  var start = s.idx;
+  do {
+    s.idx = (s.idx - 1 + s.deck.length) % s.deck.length;
+    var v = s.deck[s.idx];
+    if (!isRetired('retire_tense_' + t + '_' + v.verb.replace(/\s+/g,'_'))) break;
+  } while (s.idx !== start);
   showTenseCard(t);
 }
 
