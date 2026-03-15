@@ -6673,6 +6673,11 @@ function toggleRetire(type) {
     arr.push({ id: id, text: getRetireLabel(type), source: getRetireSource(type), type: type, retiredAt: Date.now() });
     saveMastered(arr);
     showToast('🔥 Mastered! (' + arr.length + ' total)');
+    // Auto-advance to next non-retired card
+    if (type === 'vocab')   nextVocabCard();
+    else if (type === 't150') nextTop150();
+    else if (type === 'fav')  { initFavs(); }
+    else if (type === 'pret' || type === 'imp' || type === 'subj' || type === 'cond') nextTenseCard(type);
   }
   updateRetireButtons();
   renderMastered();
