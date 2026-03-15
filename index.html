@@ -1081,7 +1081,22 @@
     .ans-btn         { font-size: 0.78rem; padding: 8px 11px; border-radius: 9px; }
     .ans-shuffle     { padding: 8px 11px; }
     .ans-flip        { padding: 8px 11px; }
-    .fav-btn, .speak-btn { width: 34px; height: 34px; font-size: 0.95rem; }
+    .retire-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--accent1);
+    background: transparent;
+    color: var(--accent1);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .retire-btn:hover { background: rgba(255,107,53,0.15); transform: scale(1.1); }
+  .retire-btn.retired { background: var(--accent1); color: #fff; border-color: var(--accent1); }
+
+  .fav-btn, .speak-btn { width: 34px; height: 34px; font-size: 0.95rem; }
 
     /* ── HEADERS ── */
     .tense-screen-header h2 { font-size: 1rem; }
@@ -1172,7 +1187,22 @@
     .nav-arrow { width: 30px; height: 30px; min-width: 30px; font-size: 1rem; }
     #answer-btns, .answer-btns { gap: 5px; flex-wrap: nowrap; }
     .ans-btn  { font-size: 0.72rem; padding: 6px 9px; }
-    .fav-btn, .speak-btn { width: 30px; height: 30px; font-size: 0.85rem; }
+    .retire-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--accent1);
+    background: transparent;
+    color: var(--accent1);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .retire-btn:hover { background: rgba(255,107,53,0.15); transform: scale(1.1); }
+  .retire-btn.retired { background: var(--accent1); color: #fff; border-color: var(--accent1); }
+
+  .fav-btn, .speak-btn { width: 30px; height: 30px; font-size: 0.85rem; }
 
     /* Headers */
     .tense-screen-header h2 { font-size: 0.82rem; }
@@ -1254,6 +1284,7 @@
       <button class="nav-btn" onclick="showScreen('cond')">↔ Conditional</button>
       <button class="nav-btn" onclick="showScreen('vocab')">💬 Vocabulary</button>
       <button class="nav-btn" onclick="showScreen('favs')">⭐ Favourites</button>
+      <button class="nav-btn" onclick="showScreen('mastered')">🔥 Mastered</button>
       <button class="nav-btn nav-btn-quiz" onclick="showScreen('quiz')"><span class="quiz-brain">🧠</span> Quiz</button>
     </div>
   </nav>
@@ -1328,6 +1359,7 @@
       </div>
       <div class="answer-btns" id="vocab-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="vocab-fav-btn" onclick="toggleFav('vocab')" title="Add to Favourites">☆</button>
+        <button class="retire-btn" id="vocab-retire-btn" onclick="toggleRetire('vocab')" title="Retire — never show again">🔥</button>
         <button class="speak-btn" id="vocab-speak-btn" onclick="speakCard('vocab-card', document.getElementById('vc-es').textContent, this)" title="Front: speak Spanish word · Back: speak Spanish word">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipVocabCard()">🔄 Flip</button>
         <div class="sa-btns">
@@ -1388,6 +1420,7 @@
 
       <div id="top150-btns" style="display:flex;gap:10px;flex-shrink:0;padding-bottom:4px;flex-wrap:wrap;justify-content:center;align-items:center;">
         <button class="fav-btn" id="t150-fav-btn" onclick="toggleFav('t150')" title="Add to Favourites">☆</button>
+        <button class="retire-btn" id="t150-retire-btn" onclick="toggleRetire('t150')" title="Retire — never show again">🔥</button>
         <button class="speak-btn" id="t150-speak-btn" onclick="speakCard('t150-card', document.getElementById('t150-verb-text').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" style="background:var(--btn-bg);border:2px solid var(--btn-hover);color:var(--text-sub);padding:14px 22px;" onclick="flipTop150()">🔄 Flip</button>
         <div class="sa-btns">
@@ -1434,6 +1467,7 @@
         </div>
         <div id="favs-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;flex-shrink:0;">
           <button class="fav-btn active" id="fav-remove-btn" onclick="toggleFav('fav')" title="Remove from Favourites" style="border-color:gold;">★</button>
+          <button class="retire-btn" id="fav-retire-btn" onclick="toggleRetire('fav')" title="Retire — never show again">🔥</button>
           <button class="speak-btn" id="fav-speak-btn" onclick="speakCard('fav-card', document.getElementById('fav-card').dataset.speak, this)" title="Front: speak Spanish · Back: speak conjugations or word">🔊</button>
           <button class="ans-btn ans-flip" id="fav-flip-btn" style="background:var(--btn-bg);border:2px solid var(--btn-hover);color:var(--text-sub);padding:14px 22px;" onclick="flipFavCard()">🔄 Flip</button>
           <div class="sa-btns">
@@ -1469,6 +1503,7 @@
       </div>
       <div class="answer-btns" id="pret-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="pret-fav-btn" onclick="toggleFav('pret')" title="Add to Favourites">☆</button>
+        <button class="retire-btn" id="pret-retire-btn" onclick="toggleRetire('pret')" title="Retire — never show again">🔥</button>
         <button class="speak-btn" id="pret-speak-btn" onclick="speakCard('pret-card', document.getElementById('pret-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('pret')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1504,6 +1539,7 @@
       </div>
       <div class="answer-btns" id="imp-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="imp-fav-btn" onclick="toggleFav('imp')" title="Add to Favourites">☆</button>
+        <button class="retire-btn" id="imp-retire-btn" onclick="toggleRetire('imp')" title="Retire — never show again">🔥</button>
         <button class="speak-btn" id="imp-speak-btn" onclick="speakCard('imp-card', document.getElementById('imp-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('imp')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1539,6 +1575,7 @@
       </div>
       <div class="answer-btns" id="subj-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="subj-fav-btn" onclick="toggleFav('subj')" title="Add to Favourites">☆</button>
+        <button class="retire-btn" id="subj-retire-btn" onclick="toggleRetire('subj')" title="Retire — never show again">🔥</button>
         <button class="speak-btn" id="subj-speak-btn" onclick="speakCard('subj-card', document.getElementById('subj-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('subj')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1574,6 +1611,7 @@
       </div>
       <div class="answer-btns" id="cond-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="cond-fav-btn" onclick="toggleFav('cond')" title="Add to Favourites">☆</button>
+        <button class="retire-btn" id="cond-retire-btn" onclick="toggleRetire('cond')" title="Retire — never show again">🔥</button>
         <button class="speak-btn" id="cond-speak-btn" onclick="speakCard('cond-card', document.getElementById('cond-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('cond')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1584,6 +1622,24 @@
       </div>
     </div>
 
+
+
+
+    <!-- MASTERED -->
+    <div id="screen-mastered" class="screen">
+      <div id="mastered-header" style="display:flex;align-items:center;gap:12px;flex-shrink:0;padding:8px 16px 4px;flex-wrap:wrap;">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem,3.5vw,2rem);color:var(--accent1);margin:0;">🔥 Mastered</h2>
+        <span id="mastered-count" style="color:var(--accent2);font-weight:800;font-size:1.05rem;"></span>
+        <button class="ans-btn" style="background:var(--btn-bg);border:2px solid var(--accent4);color:var(--accent4);padding:8px 16px;font-size:0.9rem;" onclick="clearAllMastered()">🗑️ Clear All</button>
+      </div>
+      <div id="mastered-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 20px;text-align:center;">
+        <div style="font-size:3rem;">🔥</div>
+        <p style="color:var(--text-sub);font-size:1.1rem;line-height:1.6;">No mastered cards yet!<br>Tap the 🔥 button on any card to retire it.<br>It will never appear in your rotation again.</p>
+      </div>
+      <div id="mastered-list" style="display:none;flex:1;overflow-y:auto;padding:8px 16px 20px;-webkit-overflow-scrolling:touch;">
+        <div id="mastered-groups"></div>
+      </div>
+    </div>
 
     <!-- QUIZ SCREEN -->
     <div id="screen-quiz" class="screen" style="flex-direction:column;align-items:center;padding:8px 16px 10px;gap:6px;overflow:hidden;">
@@ -4033,7 +4089,7 @@ function showScreen(id) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   const btns = document.querySelectorAll('.nav-btn');
-  const map = {top150:0, pret:1, imp:2, subj:3, cond:4, vocab:5, favs:6, quiz:7};
+  const map = {top150:0, pret:1, imp:2, subj:3, cond:4, vocab:5, favs:6, mastered:7, quiz:8};
   if (map[id] !== undefined) btns[map[id]].classList.add('active');
   if (id === 'top150') initTop150();
   if (id === 'vocab') resetVocabDeck();
@@ -4085,7 +4141,7 @@ function showVocabCard() {
   const vocabCard = document.getElementById('vocab-card');
   vocabCard.dataset.speakFront = v.es;
   vocabCard.dataset.speakBack  = v.es;
-  updateFavButtons();
+  updateFavButtons(); updateRetireButtons();
 }
 function flipVocabCard() {
   const ab = document.getElementById('vocab-answer-btns');
@@ -4986,7 +5042,7 @@ function showTop150Card() {
   card.dataset.speakFront = v.verb;
   card.dataset.speakBack = JSON.stringify(buildConjPhrases(v.verb, 'present'));
   card.style.animation = 'none'; card.offsetHeight; card.style.animation = '';
-  updateFavButtons();
+  updateFavButtons(); updateRetireButtons();
 }
 function flipTop150() {
   top150Flipped = !top150Flipped;
@@ -5381,7 +5437,7 @@ function showTenseCard(t) {
   card.dataset.speakFront = v.verb;
   card.dataset.speakBack = JSON.stringify(Object.entries(v.conj).map(([pr,c]) => pr + ' ' + c));
   card.style.animation = 'none'; card.offsetHeight; card.style.animation = '';
-  updateFavButtons();
+  updateFavButtons(); updateRetireButtons();
 }
 
 function flipTenseCard(t) {
@@ -5484,7 +5540,7 @@ function toggleFav(type) {
     }
     if (card) { favs.push(card); saveFavs(); showToast('⭐ Added to Favourites!'); }
   }
-  updateFavButtons();
+  updateFavButtons(); updateRetireButtons();
 }
 
 function updateFavButtons() {
@@ -6510,6 +6566,216 @@ function resetQuizProgress() {
     attachAll();
   }
 })();
+
+// ── MASTERED / RETIRE SYSTEM ────────────────────────────────────────────────
+
+let mastered = JSON.parse(localStorage.getItem('mexispeak_mastered') || '[]');
+
+function saveMastered() {
+  localStorage.setItem('mexispeak_mastered', JSON.stringify(mastered));
+}
+
+function isRetired(id) {
+  return mastered.some(m => m.id === id);
+}
+
+function getCurrentRetireId(type) {
+  // Same logic as getCurrentFavId
+  if (type === 'vocab') return makeFavId('vocab', vocabDeck[vocabIdx]?.es);
+  if (type === 't150')  return makeFavId('t150', top150Deck[top150Idx]?.verb);
+  if (['pret','imp','subj','cond'].includes(type)) {
+    const d = tenseDeckState[type];
+    return makeFavId(type, d?.deck[d.idx]?.verb);
+  }
+  if (type === 'fav') return favDeck[favIdx]?.id;
+  return null;
+}
+
+function getCurrentRetireLabel(type) {
+  if (type === 'vocab') {
+    const v = vocabDeck[vocabIdx];
+    return { text: v?.es, source: currentVocabCategory, type: 'vocab' };
+  }
+  if (type === 't150') {
+    const v = top150Deck[top150Idx];
+    return { text: v?.verb, source: 'Top 150 Verbs', type: 't150' };
+  }
+  if (['pret','imp','subj','cond'].includes(type)) {
+    const d = tenseDeckState[type];
+    const labels = { pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional' };
+    return { text: d?.deck[d.idx]?.verb, source: labels[type], type: type };
+  }
+  if (type === 'fav') {
+    const f = favDeck[favIdx];
+    return { text: f?.front, source: f?.sourceLabel || 'Favourites', type: 'fav' };
+  }
+  return null;
+}
+
+function toggleRetire(type) {
+  const id = getCurrentRetireId(type);
+  if (!id) return;
+  const existing = mastered.findIndex(m => m.id === id);
+  if (existing >= 0) {
+    // Un-retire
+    mastered.splice(existing, 1);
+    saveMastered();
+    showToast('↩️ Restored to rotation');
+  } else {
+    // Retire
+    const info = getCurrentRetireLabel(type);
+    mastered.push({ id, text: info?.text || id, source: info?.source || type, type: info?.type || type, retiredAt: Date.now() });
+    saveMastered();
+    showToast('🔥 Mastered — removed from rotation');
+    // Auto-advance to next card
+    setTimeout(() => {
+      if (type === 'vocab')   nextVocabCard();
+      else if (type === 't150') nextTop150();
+      else if (type === 'fav')  { initFavs(); return; }
+      else if (['pret','imp','subj','cond'].includes(type)) nextTenseCard(type);
+    }, 600);
+  }
+  updateRetireButtons();
+  renderMastered();
+}
+
+function updateRetireButtons() {
+  const screens = ['t150','vocab','pret','imp','subj','cond'];
+  screens.forEach(type => {
+    const btn = document.getElementById(type + '-retire-btn');
+    if (!btn) return;
+    const id = getCurrentRetireId(type);
+    const retired = id && isRetired(id);
+    btn.classList.toggle('retired', !!retired);
+    btn.title = retired ? 'Restore to rotation' : 'Retire — never show again';
+  });
+  // fav screen
+  const favBtn = document.getElementById('fav-retire-btn');
+  if (favBtn) {
+    const id = getCurrentRetireId('fav');
+    const retired = id && isRetired(id);
+    favBtn.classList.toggle('retired', !!retired);
+  }
+}
+
+// Filter retired cards from decks
+function filterRetired(deck, idFn) {
+  return deck.filter(card => !isRetired(idFn(card)));
+}
+
+// Render the mastered screen
+function renderMastered() {
+  const count = mastered.length;
+  document.getElementById('mastered-count').textContent = count ? count + ' cards mastered' : '';
+  document.getElementById('mastered-empty').style.display = count ? 'none' : 'flex';
+  document.getElementById('mastered-list').style.display = count ? 'block' : 'none';
+
+  if (!count) return;
+
+  // Group by source
+  const groups = {};
+  mastered.forEach(m => {
+    const src = m.source || 'Other';
+    if (!groups[src]) groups[src] = [];
+    groups[src].push(m);
+  });
+
+  const container = document.getElementById('mastered-groups');
+  container.innerHTML = Object.entries(groups).map(([src, items]) => `
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent1);letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid var(--btn-hover);padding-bottom:4px;">
+        ${src} <span style="color:var(--text-sub);font-size:0.8rem;font-family:'Nunito',sans-serif;">(${items.length})</span>
+      </div>
+      ${items.map(m => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:10px;background:var(--btn-bg);margin-bottom:6px;">
+          <span style="color:var(--text-main);font-weight:700;font-size:0.95rem;">${m.text}</span>
+          <button onclick="unretireById('${m.id}')" style="background:transparent;border:1.5px solid var(--accent3);color:var(--accent3);border-radius:8px;padding:3px 10px;font-size:0.78rem;font-weight:800;cursor:pointer;" title="Restore to rotation">↩️ Restore</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function unretireById(id) {
+  const idx = mastered.findIndex(m => m.id === id);
+  if (idx >= 0) {
+    mastered.splice(idx, 1);
+    saveMastered();
+    showToast('↩️ Restored to rotation');
+    renderMastered();
+    updateRetireButtons();
+  }
+}
+
+function clearAllMastered() {
+  if (!mastered.length) return;
+  if (!confirm('Restore all ' + mastered.length + ' mastered cards to rotation?')) return;
+  mastered = [];
+  saveMastered();
+  renderMastered();
+  updateRetireButtons();
+  showToast('↩️ All cards restored to rotation');
+}
+
+// Hook into buildQuizDeck to filter retired cards
+const _origBuildQuizDeck = buildQuizDeck;
+buildQuizDeck = function(deckVal) {
+  const cards = _origBuildQuizDeck(deckVal);
+  return cards.filter(c => !isRetired(c.cardId));
+};
+
+// Hook into showTop150Card to skip retired
+const _origNextTop150 = nextTop150;
+nextTop150 = function() {
+  _origNextTop150();
+  // If new card is retired, keep advancing (max 1 full pass)
+  let tries = 0;
+  while (isRetired(makeFavId('t150', top150Deck[top150Idx]?.verb)) && tries++ < top150Deck.length) {
+    _origNextTop150();
+  }
+};
+
+const _origPrevTop150 = prevTop150;
+prevTop150 = function() {
+  _origPrevTop150();
+  let tries = 0;
+  while (isRetired(makeFavId('t150', top150Deck[top150Idx]?.verb)) && tries++ < top150Deck.length) {
+    _origPrevTop150();
+  }
+};
+
+// Hook vocab navigation to skip retired
+const _origNextVocab = nextVocabCard;
+nextVocabCard = function() {
+  _origNextVocab();
+  let tries = 0;
+  while (isRetired(makeFavId('vocab', vocabDeck[vocabIdx]?.es)) && tries++ < vocabDeck.length) {
+    _origNextVocab();
+  }
+};
+
+const _origPrevVocab = prevVocabCard;
+prevVocabCard = function() {
+  _origPrevVocab();
+  let tries = 0;
+  while (isRetired(makeFavId('vocab', vocabDeck[vocabIdx]?.es)) && tries++ < vocabDeck.length) {
+    _origPrevVocab();
+  }
+};
+
+// Hook tense navigation to skip retired cards
+['pret','imp','subj','cond'].forEach(function(t) {
+  const origNext = nextTenseCard;
+  const origPrev = prevTenseCard;
+  // We wrap at the call level in toggleRetire's setTimeout instead
+  // so no need to re-wrap here — toggleRetire auto-advances already
+});
+
+// Init mastered on load
+document.addEventListener('DOMContentLoaded', function() {
+  renderMastered();
+  updateRetireButtons();
+});
 </script>
 </body>
 </html>
