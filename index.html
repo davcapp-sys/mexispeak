@@ -4125,16 +4125,6 @@ function resetVocabDeck() {
 }
 function shuffleVocabDeck() { vocabDeck = shuffle([...vocabDeck]); vocabIdx = 0; showVocabCard(); showToast('🔀 Shuffled!'); }
 function showVocabCard() {
-  // Skip retired cards
-  let skips = 0;
-  while (skips < vocabDeck.length && typeof isRetired === 'function') {
-    const v = vocabDeck[vocabIdx];
-    if (!v) break;
-    const cat = document.getElementById('vocab-cat-select')?.value || '';
-    if (!isRetired('retire_vocab_' + cat + '_' + v.rank)) break;
-    vocabIdx = (vocabIdx + 1) % vocabDeck.length;
-    skips++;
-  }
   vocabFlipped = false;
   document.getElementById('vocab-card').classList.remove('flipped');
   const v = vocabDeck[vocabIdx];
@@ -5035,14 +5025,6 @@ function buildConjPhrases(verb, tense) {
 }
 
 function showTop150Card() {
-  // Skip retired cards
-  let skips = 0;
-  while (skips < top150Deck.length && typeof isRetired === 'function') {
-    const v = top150Deck[top150Idx];
-    if (!v || !isRetired('retire_t150_' + v.verb.replace(/\s+/g,'_'))) break;
-    top150Idx = (top150Idx + 1) % top150Deck.length;
-    skips++;
-  }
   top150Flipped = false;
   top150ActiveTense = 'present';
   const card = document.getElementById('t150-card');
@@ -5420,17 +5402,6 @@ function enForTense(rawEn, tense) {
 }
 
 function showTenseCard(t) {
-  // Skip retired cards
-  const s0 = tenseDeckState[t];
-  if (s0 && typeof isRetired === 'function') {
-    let skips = 0;
-    while (skips < s0.deck.length) {
-      const v = s0.deck[s0.idx];
-      if (!v || !isRetired('retire_tense_' + t + '_' + v.verb.replace(/\s+/g,'_'))) break;
-      s0.idx = (s0.idx + 1) % s0.deck.length;
-      skips++;
-    }
-  }
   const s = tenseDeckState[t];
   s.flipped = false;
   const card = document.getElementById(t + '-card');
@@ -5951,7 +5922,6 @@ function buildQuizDeck(deckVal) {
   function addVocab(items, label, cat) {
     items.forEach((v, idx) => {
       if (!v.es || !v.en) return;
-      if (typeof isRetired === 'function' && isRetired('retire_vocab_' + cat + '_' + v.rank)) return;
       cards.push({
         label,
         question: v.en,
@@ -5971,7 +5941,6 @@ function buildQuizDeck(deckVal) {
     addVocab(VOCAB[cat] || [], 'Vocabulary — ' + cat, cat);
   } else if (deckVal === 'top150') {
     TOP150.forEach(v => {
-      if (typeof isRetired === 'function' && isRetired('retire_t150_' + v.verb.replace(/\s+/g,'_'))) return;
       cards.push({
         label: 'Top 150 Verbs',
         question: v.en,
@@ -5985,7 +5954,7 @@ function buildQuizDeck(deckVal) {
   } else if (deckVal.startsWith('tense_')) {
     const t = deckVal.replace('tense_', '');
     const tenseNames = {pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional'};
-    const deck = (TENSE_DECKS[t] || []).filter(v => typeof isRetired !== 'function' || !isRetired('retire_tense_' + t + '_' + v.verb.replace(/\s+/g,'_')));
+    const deck = TENSE_DECKS[t] || [];
     const pronouns = ['yo','tú','él/ella/usted','nosotros','ustedes'];
     const prEN = {'yo':'I','tú':'you','él/ella/usted':'he/she/you','nosotros':'we','ustedes':'you all'};
     deck.forEach(v => {
@@ -6600,184 +6569,168 @@ function resetQuizProgress() {
 
 // ── MASTERED / RETIRE SYSTEM ────────────────────────────────────────────────
 
-let mastered = JSON.parse(localStorage.getItem('mexispeak_mastered') || '[]');
-
-function saveMastered() {
-  localStorage.setItem('mexispeak_mastered', JSON.stringify(mastered));
+function loadMastered() {
+  try { return JSON.parse(localStorage.getItem('mexispeak_mastered') || '[]'); }
+  catch(e) { return []; }
 }
-
+function saveMastered(arr) {
+  localStorage.setItem('mexispeak_mastered', JSON.stringify(arr));
+}
 function isRetired(id) {
-  return mastered.some(m => m.id === id);
+  return loadMastered().some(function(m) { return m.id === id; });
 }
 
-function getCurrentRetireId(type) {
-  if (type === 'vocab') {
-    const v = vocabDeck[vocabIdx];
-    if (!v) return null;
-    const cat = document.getElementById('vocab-cat-select').value;
-    return 'retire_vocab_' + cat + '_' + v.rank;
-  }
-  if (type === 't150') {
-    const v = top150Deck[top150Idx];
-    return v ? 'retire_t150_' + v.verb.replace(/\s+/g,'_') : null;
-  }
-  if (['pret','imp','subj','cond'].includes(type)) {
-    const d = tenseDeckState[type];
-    const v = d?.deck[d.idx];
-    return v ? 'retire_tense_' + type + '_' + v.verb.replace(/\s+/g,'_') : null;
-  }
-  if (type === 'fav') return favDeck[favIdx]?.id ? 'retire_fav_' + favDeck[favIdx].id : null;
+function getRetireId(type) {
+  try {
+    if (type === 'vocab') {
+      var v = vocabDeck[vocabIdx];
+      var cat = document.getElementById('vocab-cat-select').value;
+      return v ? ('retire_vocab_' + cat + '_' + v.rank) : null;
+    }
+    if (type === 't150') {
+      var v = top150Deck[top150Idx];
+      return v ? ('retire_t150_' + v.verb.replace(/\s+/g,'_')) : null;
+    }
+    if (type === 'pret' || type === 'imp' || type === 'subj' || type === 'cond') {
+      var d = tenseDeckState[type];
+      var v = d && d.deck[d.idx];
+      return v ? ('retire_tense_' + type + '_' + v.verb.replace(/\s+/g,'_')) : null;
+    }
+    if (type === 'fav') {
+      var f = favDeck[favIdx];
+      return f ? ('retire_fav_' + f.id) : null;
+    }
+  } catch(e) { return null; }
   return null;
 }
 
-function getCurrentRetireLabel(type) {
+function getRetireLabel(type) {
+  try {
+    if (type === 'vocab') { var v = vocabDeck[vocabIdx]; return v ? v.es : ''; }
+    if (type === 't150')  { var v = top150Deck[top150Idx]; return v ? v.verb : ''; }
+    if (type === 'pret' || type === 'imp' || type === 'subj' || type === 'cond') {
+      var d = tenseDeckState[type]; var v = d && d.deck[d.idx]; return v ? v.verb : '';
+    }
+    if (type === 'fav') { var f = favDeck[favIdx]; return f ? (f.front || f.id) : ''; }
+  } catch(e) {}
+  return '';
+}
+
+function getRetireSource(type) {
   if (type === 'vocab') {
-    const v = vocabDeck[vocabIdx];
-    const sel = document.getElementById('vocab-cat-select');
-    const catLabel = sel ? sel.options[sel.selectedIndex]?.text : 'Vocabulary';
-    return { text: v?.es, source: catLabel, type: 'vocab' };
+    var sel = document.getElementById('vocab-cat-select');
+    return sel ? sel.options[sel.selectedIndex].text : 'Vocabulary';
   }
-  if (type === 't150') {
-    const v = top150Deck[top150Idx];
-    return { text: v?.verb, source: 'Top 150 Verbs', type: 't150' };
-  }
-  if (['pret','imp','subj','cond'].includes(type)) {
-    const d = tenseDeckState[type];
-    const labels = { pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional' };
-    return { text: d?.deck[d.idx]?.verb, source: labels[type], type: type };
-  }
-  if (type === 'fav') {
-    const f = favDeck[favIdx];
-    return { text: f?.front, source: f?.sourceLabel || 'Favourites', type: 'fav' };
-  }
-  return null;
+  var labels = {t150:'Top 150 Verbs', pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional', fav:'Favourites'};
+  return labels[type] || type;
 }
 
 function toggleRetire(type) {
-  const id = getCurrentRetireId(type);
-  if (!id) return;
-  const existing = mastered.findIndex(m => m.id === id);
-  if (existing >= 0) {
-    // Un-retire
-    mastered.splice(existing, 1);
-    saveMastered();
+  var id = getRetireId(type);
+  if (!id) { showToast('Could not identify card'); return; }
+  var arr = loadMastered();
+  var found = -1;
+  for (var i = 0; i < arr.length; i++) { if (arr[i].id === id) { found = i; break; } }
+  if (found >= 0) {
+    arr.splice(found, 1);
+    saveMastered(arr);
     showToast('↩️ Restored to rotation');
   } else {
-    // Retire
-    const info = getCurrentRetireLabel(type);
-    mastered.push({ id, text: info?.text || id, source: info?.source || type, type: info?.type || type, retiredAt: Date.now() });
-    saveMastered();
-    showToast('🔥 Mastered! (' + mastered.length + ' total)');
-    // Auto-advance to next card
-    setTimeout(() => {
-      if (type === 'vocab')   nextVocabCard();
-      else if (type === 't150') nextTop150();
-      else if (type === 'fav')  { initFavs(); return; }
-      else if (['pret','imp','subj','cond'].includes(type)) {
-        nextTenseCard(type);
-        // Skip further retired tense cards
-        const d = tenseDeckState[type];
-        let tries = 0;
-        while (d && isRetired('retire_tense_' + type + '_' + d.deck[d.idx]?.verb?.replace(/\s+/g,'_')) && tries++ < d.deck.length) {
-          nextTenseCard(type);
-        }
-      }
-    }, 600);
+    arr.push({ id: id, text: getRetireLabel(type), source: getRetireSource(type), type: type, retiredAt: Date.now() });
+    saveMastered(arr);
+    showToast('🔥 Mastered! (' + arr.length + ' total)');
   }
   updateRetireButtons();
   renderMastered();
 }
 
 function updateRetireButtons() {
-  const screens = ['t150','vocab','pret','imp','subj','cond'];
-  screens.forEach(type => {
-    const btn = document.getElementById(type + '-retire-btn');
-    if (!btn) return;
-    const id = getCurrentRetireId(type);
-    const retired = id && isRetired(id);
-    btn.classList.toggle('retired', !!retired);
+  var types = ['vocab','t150','pret','imp','subj','cond','fav'];
+  for (var i = 0; i < types.length; i++) {
+    var btn = document.getElementById(types[i] + '-retire-btn');
+    if (!btn) continue;
+    var id = getRetireId(types[i]);
+    var retired = !!(id && isRetired(id));
+    btn.classList.toggle('retired', retired);
     btn.title = retired ? 'Restore to rotation' : 'Retire — never show again';
-  });
-  // fav screen
-  const favBtn = document.getElementById('fav-retire-btn');
-  if (favBtn) {
-    const id = getCurrentRetireId('fav');
-    const retired = id && isRetired(id);
-    favBtn.classList.toggle('retired', !!retired);
   }
 }
 
-// Filter retired cards from decks
-function filterRetired(deck, idFn) {
-  return deck.filter(card => !isRetired(idFn(card)));
-}
-
-// Render the mastered screen
 function renderMastered() {
-  const count = mastered.length;
-  document.getElementById('mastered-count').textContent = count ? count + ' cards mastered' : '';
-  document.getElementById('mastered-empty').style.display = count ? 'none' : 'flex';
-  document.getElementById('mastered-list').style.display = count ? 'block' : 'none';
-
-  if (!count) return;
-
-  // Group by source
-  const groups = {};
-  mastered.forEach(m => {
-    const src = m.source || 'Other';
+  var arr = loadMastered();
+  var countEl = document.getElementById('mastered-count');
+  var emptyEl = document.getElementById('mastered-empty');
+  var listEl  = document.getElementById('mastered-list');
+  var groupsEl = document.getElementById('mastered-groups');
+  if (!countEl) return;
+  countEl.textContent = arr.length ? (arr.length + ' cards mastered') : '';
+  emptyEl.style.display = arr.length ? 'none' : 'flex';
+  listEl.style.display  = arr.length ? 'block' : 'none';
+  groupsEl.innerHTML = '';
+  if (!arr.length) return;
+  var groups = {};
+  for (var i = 0; i < arr.length; i++) {
+    var src = arr[i].source || 'Other';
     if (!groups[src]) groups[src] = [];
-    groups[src].push(m);
-  });
-
-  const container = document.getElementById('mastered-groups');
-  container.innerHTML = Object.entries(groups).map(([src, items]) => `
-    <div style="margin-bottom:20px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent1);letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid var(--btn-hover);padding-bottom:4px;">
-        ${src} <span style="color:var(--text-sub);font-size:0.8rem;font-family:'Nunito',sans-serif;">(${items.length})</span>
-      </div>
-      ${items.map(m => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:10px;background:var(--btn-bg);margin-bottom:6px;">
-          <span style="color:var(--text-main);font-weight:700;font-size:0.95rem;">${m.text}</span>
-          <button onclick="unretireById('${m.id}')" style="background:transparent;border:1.5px solid var(--accent3);color:var(--accent3);border-radius:8px;padding:3px 10px;font-size:0.78rem;font-weight:800;cursor:pointer;" title="Restore to rotation">↩️ Restore</button>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
+    groups[src].push(arr[i]);
+  }
+  var srcKeys = Object.keys(groups);
+  for (var s = 0; s < srcKeys.length; s++) {
+    var src = srcKeys[s];
+    var items = groups[src];
+    var groupDiv = document.createElement('div');
+    groupDiv.style.marginBottom = '20px';
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'font-size:1.1rem;color:var(--accent1);letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid var(--btn-hover);padding-bottom:4px;';
+    hdr.textContent = src + ' (' + items.length + ')';
+    groupDiv.appendChild(hdr);
+    for (var j = 0; j < items.length; j++) {
+      var m = items[j];
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:10px;background:var(--btn-bg);margin-bottom:6px;';
+      var lbl = document.createElement('span');
+      lbl.style.cssText = 'color:var(--text-main);font-weight:700;font-size:0.95rem;';
+      lbl.textContent = m.text || m.id;
+      var btn = document.createElement('button');
+      btn.style.cssText = 'background:transparent;border:1.5px solid var(--accent3);color:var(--accent3);border-radius:8px;padding:3px 10px;font-size:0.78rem;font-weight:800;cursor:pointer;';
+      btn.textContent = '↩️ Restore';
+      (function(id) {
+        btn.addEventListener('click', function() { unretireById(id); });
+      })(m.id);
+      row.appendChild(lbl);
+      row.appendChild(btn);
+      groupDiv.appendChild(row);
+    }
+    groupsEl.appendChild(groupDiv);
+  }
 }
 
 function unretireById(id) {
-  const idx = mastered.findIndex(m => m.id === id);
-  if (idx >= 0) {
-    mastered.splice(idx, 1);
-    saveMastered();
-    showToast('↩️ Restored to rotation');
-    renderMastered();
-    updateRetireButtons();
+  var arr = loadMastered();
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i].id === id) { arr.splice(i, 1); break; }
   }
+  saveMastered(arr);
+  showToast('↩️ Restored to rotation');
+  renderMastered();
+  updateRetireButtons();
 }
 
 function clearAllMastered() {
-  if (!mastered.length) return;
-  if (!confirm('Restore all ' + mastered.length + ' mastered cards to rotation?')) return;
-  mastered = [];
-  saveMastered();
+  var arr = loadMastered();
+  if (!arr.length) return;
+  if (!confirm('Restore all ' + arr.length + ' mastered cards to rotation?')) return;
+  saveMastered([]);
   renderMastered();
   updateRetireButtons();
-  showToast('↩️ All cards restored to rotation');
+  showToast('↩️ All cards restored');
 }
 
-// quiz retired-card filtering handled in buildQuizDeck directly
-
-// Hook into showTop150Card to skip retired
-// nav skip-retired handled inside showTop150Card and showVocabCard
-
-
-
-// Init mastered on load
 document.addEventListener('DOMContentLoaded', function() {
   renderMastered();
   updateRetireButtons();
 });
+
 </script>
 </body>
-</html>
+    out += '<div style="font-family:sans-serif;font-size:1.1rem;color:var(--accent1);letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid var(--btn-hover);padding-bottom:4px;">' + src + ' <span style="color:var(--text-sub);font-size:0.8rem;">(' + items.length + ')</span></div>';
