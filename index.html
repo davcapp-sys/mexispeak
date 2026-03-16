@@ -6297,7 +6297,7 @@ function quizCardRetired(card) {
   return retireId ? isRetired(retireId) : false;
 }
 
-function buildQuizDeck(deckVal) {
+function buildQuizDeck(deckVal, skipRetireFilter) {
   const cards = [];
 
   function addVocab(items, label, cat) {
@@ -6380,15 +6380,24 @@ function buildQuizDeck(deckVal) {
     });
   }
 
-  // Filter out retired cards
+  // Filter out retired cards (unless called for distractor pool)
+  if (skipRetireFilter) return cards;
   return cards.filter(function(c) { return !quizCardRetired(c); });
 }
 
 function getDistractors(card, allCards, count) {
-  // Build pool of wrong answers from same deck
-  const wrong = allCards
+  // Build pool of wrong answers from filtered deck first
+  let wrong = allCards
     .filter(c => c.cardId !== card.cardId && c.answer !== card.answer)
     .map(c => c.answer);
+  // If not enough, top up from the full unfiltered deck
+  if (wrong.length < count) {
+    const fullDeck = buildQuizDeck(quizDeckKey, true); // true = skip retire filter
+    const extra = fullDeck
+      .filter(c => c.cardId !== card.cardId && c.answer !== card.answer)
+      .map(c => c.answer);
+    wrong = [...wrong, ...extra];
+  }
   // Dedupe
   const unique = [...new Set(wrong)];
   // Shuffle and take
@@ -6475,7 +6484,9 @@ function showQuizCard() {
   document.getElementById('quiz-card-label').textContent = card.label;
   document.getElementById('quiz-question').textContent = card.question;
   document.getElementById('quiz-question-sub').textContent = card.questionSub || '';
-  document.getElementById('quiz-feedback').textContent = '';
+  const qfb = document.getElementById('quiz-feedback');
+  qfb.textContent = '';
+  qfb.style.color = '';
   document.getElementById('quiz-next-btn').style.display = 'none';
 
   // Build 4 options: 1 correct + 3 distractors
@@ -6618,7 +6629,9 @@ function quizNext() {
   quizAnswered = false;
   const inp = document.getElementById('quiz-type-input');
   if (inp) { inp.value = ''; inp.className = ''; inp.style.transition = 'none'; inp.style.borderColor = ''; inp.style.background = ''; requestAnimationFrame(() => { inp.style.transition = ''; }); }
-  document.getElementById('quiz-feedback').textContent = '';
+  const fb = document.getElementById('quiz-feedback');
+  fb.textContent = '';
+  fb.style.color = '';
   document.getElementById('quiz-next-btn').style.display = 'none';
   showQuizCard();
 }
