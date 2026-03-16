@@ -4262,6 +4262,7 @@ function flipVocabCard() {
   if (ab) ab.classList.toggle('card-flipped', !document.getElementById('vocab-card').classList.contains('flipped'));
   vocabFlipped = !vocabFlipped;
   document.getElementById('vocab-card').classList.toggle('flipped', vocabFlipped);
+  shrinkCardBackIfNeeded(document.getElementById('vocab-card'));
 }
 function nextVocabCard() {
   var start = vocabIdx;
@@ -5353,6 +5354,7 @@ function flipTop150() {
   top150Flipped = !top150Flipped;
   document.getElementById('t150-card').classList.toggle('flipped', top150Flipped);
   document.getElementById('top150-btns').classList.toggle('card-flipped', top150Flipped);
+  shrinkCardBackIfNeeded(document.getElementById('t150-card'));
 }
 function nextTop150() {
   var start = top150Idx;
@@ -5787,6 +5789,7 @@ function flipTenseCard(t) {
   document.getElementById(t + '-card').classList.toggle('flipped', s.flipped);
   const ab = document.getElementById(t + '-answer-btns');
   if (ab) ab.classList.toggle('card-flipped', s.flipped);
+  shrinkCardBackIfNeeded(document.getElementById(t + '-card'));
 }
 
 function nextTenseCard(t) {
@@ -5966,6 +5969,7 @@ function flipFavCard() {
   document.getElementById('fav-card').classList.toggle('flipped', favFlipped);
   const ab = document.getElementById('favs-answer-btns');
   if (ab) ab.classList.toggle('card-flipped', favFlipped);
+  shrinkCardBackIfNeeded(document.getElementById('fav-card'));
 }
 function nextFav() { favIdx = (favIdx + 1) % favDeck.length; showFavCard(); }
 function prevFav() { favIdx = (favIdx - 1 + favDeck.length) % favDeck.length; showFavCard(); }
@@ -6267,6 +6271,32 @@ let quizSessionCorrect = 0;
 let quizSessionTotal = 0;
 let quizAnswered = false;
 
+function quizCardRetired(card) {
+  // Translate quiz cardId format to retire ID format and check
+  if (!card || !card.cardId) return false;
+  var cid = card.cardId;
+  var retireId = null;
+  if (card.type === 'vocab' || card.type === 'fav_vocab') {
+    // cardId = 'v_cat_idx_es_prefix' — extract cat, find rank by matching es prefix
+    var parts = cid.split('_');
+    var cat = parts[1] || '';
+    var esPrefix = parts.slice(3).join('_');
+    var vocabArr = VOCAB[cat] || [];
+    var match = vocabArr.find(function(v) {
+      return (v.es||'').replace(/\s+/g,'_').slice(0,20) === esPrefix;
+    });
+    if (match) retireId = 'retire_vocab_' + cat + '_' + match.rank;
+  } else if (card.type === 'top150') {
+    // cardId = 't150_verb'
+    retireId = 'retire_' + cid;
+  } else if (card.type === 'tense') {
+    // cardId = 'tense_t_verb_pronoun' — strip last _pronoun
+    var tp = cid.split('_');
+    retireId = 'retire_tense_' + tp[1] + '_' + tp[2];
+  }
+  return retireId ? isRetired(retireId) : false;
+}
+
 function buildQuizDeck(deckVal) {
   const cards = [];
 
@@ -6350,7 +6380,8 @@ function buildQuizDeck(deckVal) {
     });
   }
 
-  return cards;
+  // Filter out retired cards
+  return cards.filter(function(c) { return !quizCardRetired(c); });
 }
 
 function getDistractors(card, allCards, count) {
@@ -7214,6 +7245,24 @@ function cardOnFire(type) {
   setTimeout(function() {
     card.classList.remove('card-on-fire');
   }, 750);
+}
+
+// ── AUTO-SHRINK CARD BACK FONT ───────────────────────────────────────────────
+function shrinkCardBackIfNeeded(cardEl) {
+  if (!cardEl) return;
+  var back = cardEl.querySelector('.card-back-content, .tense-back');
+  if (!back) return;
+  // Reset font size first
+  back.style.fontSize = '';
+  var parent = back.closest('.card-face') || back.parentElement;
+  if (!parent) return;
+  var maxH = parent.clientHeight - 16;
+  var step = 0;
+  while (back.scrollHeight > maxH && step < 10) {
+    var current = parseFloat(window.getComputedStyle(back).fontSize);
+    back.style.fontSize = (current * 0.9) + 'px';
+    step++;
+  }
 }
 </script>
 </body>
