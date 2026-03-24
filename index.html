@@ -1250,6 +1250,85 @@
     z-index: 9999;
     animation: emberPop 0.6s ease-out forwards;
   }
+
+  /* ── HUB SCREENS ── */
+  .hub-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    gap: 12px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+  .hub-screen.active { display: flex; }
+  .hub-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    letter-spacing: 3px;
+    margin: 0 0 4px 0;
+    flex-shrink: 0;
+  }
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 800px;
+  }
+  .hub-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 18px 10px;
+    border-radius: 16px;
+    background: var(--btn-bg);
+    border: 2px solid var(--btn-hover);
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+    min-height: 100px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hub-tile:hover, .hub-tile:active {
+    transform: scale(1.04);
+    border-color: var(--accent3);
+    background: var(--btn-hover);
+  }
+  .hub-tile-emoji { font-size: 2rem; line-height: 1; }
+  .hub-tile-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--text-main);
+    line-height: 1.2;
+  }
+  .hub-tile-count {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-sub);
+  }
+  /* Hub accent colors */
+  .hub-verbs .hub-title     { color: var(--accent3); }
+  .hub-verbs .hub-tile:hover   { border-color: var(--accent3); }
+  .hub-topics .hub-title    { color: var(--accent2); }
+  .hub-topics .hub-tile:hover  { border-color: var(--accent2); }
+  .hub-words .hub-title     { color: var(--purple); }
+  .hub-words .hub-tile:hover   { border-color: var(--purple); }
+  .hub-realsp .hub-title    { color: var(--accent1); }
+  .hub-realsp .hub-tile:hover  { border-color: var(--accent1); }
+
+  @media (max-width: 600px) {
+    .hub-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .hub-tile { padding: 14px 8px; min-height: 88px; }
+    .hub-tile-emoji { font-size: 1.7rem; }
+    .hub-tile-name { font-size: 0.82rem; }
+    .hub-screen { padding: 10px 10px 20px; gap: 8px; }
+  }
 </style>
 </head>
 <body>
@@ -1277,17 +1356,13 @@
       </div>
     </div>
     <div id="nav-btn-row">
-      <button class="nav-btn active" onclick="showScreen('top150')">🏆 Top 150 Verbs</button>
-      <button class="nav-btn" onclick="showScreen('pres')">🔤 Present</button>
-      <button class="nav-btn" onclick="showScreen('fut')">🔮 Future</button>
-      <button class="nav-btn" onclick="showScreen('pret')">⏮ Pretérito</button>
-      <button class="nav-btn" onclick="showScreen('imp')">〰 Imperfect</button>
-      <button class="nav-btn" onclick="showScreen('subj')">💭 Subjunctive</button>
-      <button class="nav-btn" onclick="showScreen('cond')">↔ Conditional</button>
-      <button class="nav-btn" onclick="showScreen('vocab')">💬 Vocabulary</button>
+      <button class="nav-btn active" onclick="showScreen('verbs')">🔤 Verbs</button>
+      <button class="nav-btn" onclick="showScreen('topics')">📚 Topics</button>
+      <button class="nav-btn" onclick="showScreen('words')">🧩 Descriptors</button>
+      <button class="nav-btn" onclick="showScreen('realspanish')">🗣️ Real Spanish</button>
       <button class="nav-btn" onclick="showScreen('favs')">⭐ Favourites</button>
       <button class="nav-btn" onclick="showScreen('mastered')">🔥 Mastered</button>
-      <button class="nav-btn nav-btn-quiz" onclick="showScreen('quiz')"><span class="quiz-brain">🧠</span> Quiz</button>
+      <button class="nav-btn nav-btn-quiz" onclick="showScreen('quiz')">🧠 Quiz</button>
     </div>
   </nav>
 
@@ -1373,7 +1448,7 @@
     </div>
 
     <!-- TOP 150 -->
-    <div id="screen-top150" class="screen active">
+    <div id="screen-top150" class="screen ">
       <div id="top150-header">
         <h2>🏆 Top 150 Mexican Verbs</h2>
         <div id="top150-mode">
@@ -1476,6 +1551,185 @@
             <button class="sa-btn sa-got"  onclick="selfAssess('favs', true)">✅ Got it</button>
             <button class="sa-btn sa-miss" onclick="selfAssess('favs', false)">❌ Missed it</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERBS HUB -->
+    <div id="screen-verbs" class="hub-screen hub-verbs active">
+      <h2 class="hub-title">🔤 Verbs</h2>
+      <div class="hub-grid">
+        <div class="hub-tile" onclick="showScreen('top150')">
+          <div class="hub-tile-emoji">🏆</div>
+          <div class="hub-tile-name">Top 150 Verbs</div>
+          <div class="hub-tile-count">169 verbs</div>
+        </div>
+        <div class="hub-tile" onclick="showScreen('pres')">
+          <div class="hub-tile-emoji">🔤</div>
+          <div class="hub-tile-name">Present</div>
+          <div class="hub-tile-count">141 verbs</div>
+        </div>
+        <div class="hub-tile" onclick="showScreen('pret')">
+          <div class="hub-tile-emoji">⏮</div>
+          <div class="hub-tile-name">Pretérito</div>
+          <div class="hub-tile-count">50 verbs</div>
+        </div>
+        <div class="hub-tile" onclick="showScreen('imp')">
+          <div class="hub-tile-emoji">〰</div>
+          <div class="hub-tile-name">Imperfect</div>
+          <div class="hub-tile-count">30 verbs</div>
+        </div>
+        <div class="hub-tile" onclick="showScreen('subj')">
+          <div class="hub-tile-emoji">💭</div>
+          <div class="hub-tile-name">Subjunctive</div>
+          <div class="hub-tile-count">40 verbs</div>
+        </div>
+        <div class="hub-tile" onclick="showScreen('cond')">
+          <div class="hub-tile-emoji">↔</div>
+          <div class="hub-tile-name">Conditional</div>
+          <div class="hub-tile-count">25 verbs</div>
+        </div>
+        <div class="hub-tile" onclick="showScreen('fut')">
+          <div class="hub-tile-emoji">🔮</div>
+          <div class="hub-tile-name">Future</div>
+          <div class="hub-tile-count">169 verbs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOPICS HUB -->
+    <div id="screen-topics" class="hub-screen hub-topics">
+      <h2 class="hub-title">📚 Topics</h2>
+      <div class="hub-grid">
+        <div class="hub-tile" onclick="showVocabCat('nouns_top500')">
+          <div class="hub-tile-emoji">⭐</div>
+          <div class="hub-tile-name">Top 500 Nouns</div>
+          <div class="hub-tile-count">500 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_food')">
+          <div class="hub-tile-emoji">🍽️</div>
+          <div class="hub-tile-name">Food & Drink</div>
+          <div class="hub-tile-count">120 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_health')">
+          <div class="hub-tile-emoji">🏥</div>
+          <div class="hub-tile-name">Health & Body</div>
+          <div class="hub-tile-count">101 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('travel_transport')">
+          <div class="hub-tile-emoji">✈️</div>
+          <div class="hub-tile-name">Travel & Transport</div>
+          <div class="hub-tile-count">104 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('family')">
+          <div class="hub-tile-emoji">👨‍👩‍👧</div>
+          <div class="hub-tile-name">Family</div>
+          <div class="hub-tile-count">48 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('emotions')">
+          <div class="hub-tile-emoji">😊</div>
+          <div class="hub-tile-name">Emotions</div>
+          <div class="hub-tile-count">50 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_home')">
+          <div class="hub-tile-emoji">🏠</div>
+          <div class="hub-tile-name">Home & Objects</div>
+          <div class="hub-tile-count">30 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('clothing')">
+          <div class="hub-tile-emoji">👕</div>
+          <div class="hub-tile-name">Clothing</div>
+          <div class="hub-tile-count">21 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_work')">
+          <div class="hub-tile-emoji">💼</div>
+          <div class="hub-tile-name">Work & Education</div>
+          <div class="hub-tile-count">28 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_nature')">
+          <div class="hub-tile-emoji">🌿</div>
+          <div class="hub-tile-name">Nature</div>
+          <div class="hub-tile-count">37 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('technology')">
+          <div class="hub-tile-emoji">📱</div>
+          <div class="hub-tile-name">Technology & Media</div>
+          <div class="hub-tile-count">83 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_society')">
+          <div class="hub-tile-emoji">🌍</div>
+          <div class="hub-tile-name">Society & World</div>
+          <div class="hub-tile-count">30 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('nouns_culture')">
+          <div class="hub-tile-emoji">🎭</div>
+          <div class="hub-tile-name">Mexican Culture</div>
+          <div class="hub-tile-count">36 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('shopping')">
+          <div class="hub-tile-emoji">🛒</div>
+          <div class="hub-tile-name">Shopping</div>
+          <div class="hub-tile-count">28 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('numbers_time')">
+          <div class="hub-tile-emoji">🔢</div>
+          <div class="hub-tile-name">Numbers & Time</div>
+          <div class="hub-tile-count">69 words</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORDS HUB -->
+    <div id="screen-words" class="hub-screen hub-words">
+      <h2 class="hub-title">🧩 Descriptors</h2>
+      <div class="hub-grid">
+        <div class="hub-tile" onclick="showVocabCat('adjectives')">
+          <div class="hub-tile-emoji">✨</div>
+          <div class="hub-tile-name">Adjectives</div>
+          <div class="hub-tile-count">179 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('adverbs')">
+          <div class="hub-tile-emoji">⚡</div>
+          <div class="hub-tile-name">Adverbs</div>
+          <div class="hub-tile-count">89 words</div>
+        </div>
+
+        <div class="hub-tile" onclick="showVocabCat('colors')">
+          <div class="hub-tile-emoji">🎨</div>
+          <div class="hub-tile-name">Colors</div>
+          <div class="hub-tile-count">16 words</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REAL SPANISH HUB -->
+    <div id="screen-realspanish" class="hub-screen hub-realsp">
+      <h2 class="hub-title">🗣️ Real Spanish</h2>
+      <div class="hub-grid">
+        <div class="hub-tile" onclick="showVocabCat('greetings')">
+          <div class="hub-tile-emoji">👋</div>
+          <div class="hub-tile-name">Greetings & Phrases</div>
+          <div class="hub-tile-count">21 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('questions')">
+          <div class="hub-tile-emoji">❓</div>
+          <div class="hub-tile-name">Questions & Expressions</div>
+          <div class="hub-tile-count">27 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('slang')">
+          <div class="hub-tile-emoji">🌶️</div>
+          <div class="hub-tile-name">Mexican Slang</div>
+          <div class="hub-tile-count">80 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('connectors')">
+          <div class="hub-tile-emoji">🔗</div>
+          <div class="hub-tile-name">Connectors</div>
+          <div class="hub-tile-count">48 words</div>
+        </div>
+        <div class="hub-tile" onclick="showVocabCat('prepositions')">
+          <div class="hub-tile-emoji">📍</div>
+          <div class="hub-tile-name">Prepositions</div>
+          <div class="hub-tile-count">38 words</div>
         </div>
       </div>
     </div>
@@ -4160,13 +4414,25 @@ let top150Mode = 'card';
 // ══════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════
+var _lastHubNav = 0; // tracks which hub nav button to highlight for content screens
+
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen, .hub-screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   const btns = document.querySelectorAll('.nav-btn');
-  const map = {top150:0, pres:1, fut:2, pret:3, imp:4, subj:5, cond:6, vocab:7, favs:8, mastered:9, quiz:10};
-  if (map[id] !== undefined) btns[map[id]].classList.add('active');
+  // Hub screens map directly to nav buttons
+  const hubMap = {verbs:0, topics:1, words:2, realspanish:3, favs:4, mastered:5, quiz:6};
+  if (hubMap[id] !== undefined) {
+    // Navigating to a hub — remember which hub button to use for child screens
+    if (id === 'verbs' || id === 'topics' || id === 'words' || id === 'realspanish') {
+      _lastHubNav = hubMap[id];
+    }
+    btns[hubMap[id]].classList.add('active');
+  } else if (id === 'vocab' || id === 'top150' || ['pres','fut','pret','imp','subj','cond'].includes(id)) {
+    // Content screen — highlight whichever hub we came from
+    btns[_lastHubNav].classList.add('active');
+  }
   if (id === 'top150') initTop150();
   if (id === 'vocab') resetVocabDeck();
   if (id === 'favs') initFavs();
@@ -7248,6 +7514,12 @@ function shrinkCardBackIfNeeded(cardEl) {
     back.style.fontSize = (current * 0.9) + 'px';
     step++;
   }
+}
+
+function showVocabCat(cat) {
+  var sel = document.getElementById('vocab-cat-select');
+  if (sel) sel.value = cat;
+  showScreen('vocab');
 }
 </script>
 </body>
