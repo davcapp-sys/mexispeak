@@ -1364,8 +1364,8 @@
     border: 1.5px solid var(--text-sub);
     color: var(--text-sub);
     border-radius: 50%;
-    width: 28px; height: 28px;
-    font-size: 0.85rem;
+    width: 36px; height: 36px;
+    font-size: 1rem;
     font-weight: 900;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -6181,7 +6181,9 @@ function buildTenseFavCard(t) {
     tableHTML += `<div class="verb-row"><span class="pronoun">${pr}</span><span class="conjugation">${conj}</span></div>`;
   }
   const backHTML = `<div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:8px;flex-shrink:0;">${tenseHTML}</div><div class="card-back-content">${tableHTML}</div>`;
-  return { type:t, id: getCurrentFavId(t), frontMain: enForTense(v.en, t), frontSub: '', tenseHTML, regHTML:'', source:`${tenseName} · ${v.verb}`, speakText: v.verb, speakBack: JSON.stringify(Object.entries(v.conj).map(([pr,c]) => pr + ' ' + c)), backHTML };
+  var rb = getRegBadge(v.en);
+  var regHTML = '<span class="reg-badge ' + rb.cls + '">' + rb.label + '</span>';
+  return { type:t, id: getCurrentFavId(t), frontMain: enForTense(v.en, t), frontSub: '', tenseHTML, regHTML, source:`${tenseName} · ${v.verb}`, speakText: v.verb, speakBack: JSON.stringify(Object.entries(v.conj).map(([pr,c]) => pr + ' ' + c)), backHTML };
 }
 
 // ══════════════════════════════════════════════
@@ -6296,7 +6298,7 @@ function showFavCard() {
   document.getElementById('fav-front-sub').textContent = v.frontSub || '';
   // Show tense + reg badges on front for verb cards
   const badges = document.getElementById('fav-front-badges');
-  if (v.type === 'verb' && (v.tenseHTML || v.regHTML)) {
+  if ((v.tenseHTML || v.regHTML)) {
     badges.innerHTML = (v.tenseHTML || '') + (v.regHTML || '');
     badges.style.display = 'flex';
   } else {
@@ -6734,15 +6736,15 @@ function buildQuizDeck(deckVal, skipRetireFilter) {
 }
 
 function getDistractors(card, allCards, count) {
-  // Build pool of wrong answers from filtered deck first
+  // Build pool of wrong answers from filtered deck first (mastered already excluded)
   let wrong = allCards
     .filter(c => c.cardId !== card.cardId && c.answer !== card.answer)
     .map(c => c.answer);
-  // If not enough, top up from the full unfiltered deck
+  // If not enough, top up from full deck (including mastered as fallback only)
   if (wrong.length < count) {
-    const fullDeck = buildQuizDeck(quizDeckKey, true); // true = skip retire filter
+    const fullDeck = buildQuizDeck(quizDeckKey, true);
     const extra = fullDeck
-      .filter(c => c.cardId !== card.cardId && c.answer !== card.answer)
+      .filter(c => c.cardId !== card.cardId && c.answer !== card.answer && !quizCardRetired(c))
       .map(c => c.answer);
     wrong = [...wrong, ...extra];
   }
@@ -6763,7 +6765,7 @@ function initQuizScreen() {
 
 function startQuiz() {
   const deckVal = document.getElementById('quiz-deck-select').value;
-  quizDeckKey = deckVal;
+  quizDeckKey = deckVal + '_' + quizMode;  // separate SR per mode (mc vs type)
   const allCards = buildQuizDeck(deckVal);
 
   if (allCards.length === 0) {
@@ -6792,7 +6794,6 @@ function startQuiz() {
     [due[i], due[j]] = [due[j], due[i]];
   }
 
-  // Cap session at 20 cards
   quizDeck = due.slice(0, 50);
   quizIdx = 0;
   quizSessionCorrect = 0;
@@ -7692,7 +7693,7 @@ function hideHelp() {
         <div class="help-icon">✅</div>
         <div class="help-text">
           <strong>Got it / Missed it</strong>
-          <span>Rate yourself after flipping a card. This powers the spaced repetition system — cards you miss come back sooner, cards you know get spaced further apart.</span>
+          <span>Rate yourself after flipping a card. This powers the spaced repetition system — cards you miss come back sooner, cards you know get spaced further apart. Multiple choice and typing have separate progress so typing (harder) is tracked independently.</span>
         </div>
       </div>
 
@@ -7700,7 +7701,7 @@ function hideHelp() {
         <div class="help-icon">🧠</div>
         <div class="help-text">
           <strong>Quiz</strong>
-          <span>Test yourself with multiple choice or type-in answers. The quiz skips any cards you've already mastered. Claude AI helps mark typed answers generously.</span>
+          <span>Test yourself with multiple choice or type-in answers. Cards you've 🔥 mastered are excluded entirely. Multiple choice and typing track progress separately. Claude AI helps mark typed answers generously.</span>
         </div>
       </div>
 
