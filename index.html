@@ -1329,6 +1329,101 @@
     .hub-tile-name { font-size: 0.82rem; }
     .hub-screen { padding: 10px 10px 20px; gap: 8px; }
   }
+
+  /* ── REGULARITY BADGE ── */
+  .reg-badge {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .reg-regular  { background: rgba(46,213,115,0.18); color: #2ed573; border: 1.5px solid #2ed573; }
+  .reg-stem     { background: rgba(255,215,0,0.18);  color: #ffd700; border: 1.5px solid #ffd700; }
+  .reg-irregular{ background: rgba(255,71,87,0.18);  color: #ff4757; border: 1.5px solid #ff4757; }
+  @media (max-width: 600px) {
+    .reg-badge { font-size: 0.65rem; padding: 2px 8px; }
+  }
+
+  /* ── LONG WORD HANDLING ── */
+  #vc-es, .back-english {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  #vc-es {
+    font-size: clamp(1.6rem, 5vw, 4rem);
+  }
+
+  /* ── HELP MODAL ── */
+  #help-btn {
+    background: transparent;
+    border: 1.5px solid var(--text-sub);
+    color: var(--text-sub);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    font-size: 0.85rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  #help-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+  #help-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #help-overlay.show { display: flex; }
+  #help-modal {
+    background: var(--card-front);
+    border-radius: 20px;
+    padding: 24px 20px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+  #help-modal h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    margin: 0 0 16px 0;
+  }
+  .help-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--btn-hover);
+  }
+  .help-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .help-icon { font-size: 1.6rem; flex-shrink: 0; width: 36px; text-align: center; }
+  .help-text { flex: 1; }
+  .help-text strong { color: var(--text-main); font-size: 0.95rem; display: block; margin-bottom: 3px; }
+  .help-text span { color: var(--text-sub); font-size: 0.85rem; line-height: 1.4; }
+  #help-close {
+    position: absolute; top: 14px; right: 16px;
+    background: transparent; border: none;
+    color: var(--text-sub); font-size: 1.4rem;
+    cursor: pointer; line-height: 1;
+  }
+  @media (max-width: 600px) {
+    #help-modal { padding: 20px 16px; }
+    #help-modal h3 { font-size: 1.3rem; }
+  }
 </style>
 </head>
 <body>
@@ -1337,6 +1432,7 @@
   <nav id="topnav">
     <div class="nav-top-row">
       <div id="logo">🌮 MexiSpeak</div>
+      <button id="help-btn" onclick="showHelp()" title="Help">?</button>
       <div id="voice-wrap">
         <label>🔊 Voice</label>
         <select id="voice-select" onchange="setVoice(this.value)">
@@ -1747,6 +1843,7 @@
             <div class="card-label" style="color:var(--accent3);">ENGLISH — TAP TO FLIP</div>
             <div class="tense-rank" id="pres-rank" style="color:var(--accent3);"></div>
             <div class="card-main-text tense-en" id="pres-en"></div>
+            <div id="pres-reg-badge" class="reg-badge" style="display:none;"></div>
             <div class="card-hint">👆 Tap to see Present conjugation</div>
           </div>
           <div class="card-face card-back tense-back" id="pres-back">
@@ -1783,6 +1880,7 @@
             <div class="card-label" style="color:var(--purple);">ENGLISH — TAP TO FLIP</div>
             <div class="tense-rank" id="fut-rank" style="color:var(--purple);"></div>
             <div class="card-main-text tense-en" id="fut-en"></div>
+            <div id="fut-reg-badge" class="reg-badge" style="display:none;"></div>
             <div class="card-hint">👆 Tap to see Future conjugation</div>
           </div>
           <div class="card-face card-back tense-back" id="fut-back">
@@ -1819,6 +1917,7 @@
             <div class="card-label" style="color:var(--accent1);">ENGLISH — TAP TO FLIP</div>
             <div class="tense-rank" id="pret-rank" style="color:var(--accent1);"></div>
             <div class="card-main-text tense-en" id="pret-en"></div>
+            <div id="pret-reg-badge" class="reg-badge" style="display:none;"></div>
             <div class="card-hint">👆 Tap to see Pretérito conjugation</div>
           </div>
           <div class="card-face card-back tense-back" id="pret-back">
@@ -1855,6 +1954,7 @@
             <div class="card-label" style="color:var(--accent3);">ENGLISH — TAP TO FLIP</div>
             <div class="tense-rank" id="imp-rank" style="color:var(--accent3);"></div>
             <div class="card-main-text tense-en" id="imp-en"></div>
+            <div id="imp-reg-badge" class="reg-badge" style="display:none;"></div>
             <div class="card-hint">👆 Tap to see Imperfect conjugation</div>
           </div>
           <div class="card-face card-back tense-back" id="imp-back" style="border-color:var(--accent3);">
@@ -1891,6 +1991,7 @@
             <div class="card-label" style="color:var(--purple);">ENGLISH — TAP TO FLIP</div>
             <div class="tense-rank" id="subj-rank" style="color:var(--purple);"></div>
             <div class="card-main-text tense-en" id="subj-en"></div>
+            <div id="subj-reg-badge" class="reg-badge" style="display:none;"></div>
             <div class="card-hint">👆 Tap to see Subjunctive conjugation</div>
           </div>
           <div class="card-face card-back tense-back" id="subj-back" style="border-color:var(--purple);">
@@ -1927,6 +2028,7 @@
             <div class="card-label" style="color:var(--accent2);">ENGLISH — TAP TO FLIP</div>
             <div class="tense-rank" id="cond-rank" style="color:var(--accent2);"></div>
             <div class="card-main-text tense-en" id="cond-en"></div>
+            <div id="cond-reg-badge" class="reg-badge" style="display:none;"></div>
             <div class="card-hint">👆 Tap to see Conditional conjugation</div>
           </div>
           <div class="card-face card-back tense-back" id="cond-back" style="border-color:var(--accent2);">
@@ -5990,6 +6092,14 @@ function showTenseCard(t) {
   const v = s.deck[s.idx];
   document.getElementById(t + '-rank').textContent = '#' + (s.idx + 1) + ' Most Commonly Used of ' + s.deck.length;
   document.getElementById(t + '-en').textContent = enForTense(v.en, t);
+  // Regularity badge (only on tense screens, not pres/fut which use en directly)
+  var regBadgeEl = document.getElementById(t + '-reg-badge');
+  if (regBadgeEl) {
+    var rb = getRegBadge(v.en);
+    regBadgeEl.textContent = rb.label;
+    regBadgeEl.className = 'reg-badge ' + rb.cls;
+    regBadgeEl.style.display = 'inline-block';
+  }
   document.getElementById(t + '-verb').textContent = v.verb;
   // English subject pronouns for each Spanish pronoun
   const PR_EN = {
@@ -7521,6 +7631,104 @@ function showVocabCat(cat) {
   if (sel) sel.value = cat;
   showScreen('vocab');
 }
+
+// ── REGULARITY BADGE ────────────────────────────────────────────────────────
+function getRegBadge(rawEn) {
+  var en = rawEn || '';
+  // Stem-change: look for → pattern in parentheses
+  var stemMatch = en.match(/\(([oeuiOEUI]→[^)]+)\)/);
+  if (stemMatch) {
+    return { cls: 'reg-stem', label: stemMatch[1] };
+  }
+  // Regular: explicitly marked
+  var enLower = en.toLowerCase();
+  if (enLower.indexOf('regular') !== -1 ||
+      /\(-ar[),]/.test(enLower) || /\(-er[),]/.test(enLower) || /\(-ir[),]/.test(enLower)) {
+    return { cls: 'reg-regular', label: 'Regular' };
+  }
+  // Irregular: anything else with conjugation data
+  return { cls: 'reg-irregular', label: 'Irregular' };
+}
+
+function showHelp() {
+  document.getElementById('help-overlay').classList.add('show');
+}
+function hideHelp() {
+  document.getElementById('help-overlay').classList.remove('show');
+}
 </script>
+
+  <!-- HELP MODAL -->
+  <div id="help-overlay" onclick="if(event.target===this)hideHelp()">
+    <div id="help-modal">
+      <button id="help-close" onclick="hideHelp()">✕</button>
+      <h3>🌮 How to Use MexiSpeak</h3>
+
+      <div class="help-item">
+        <div class="help-icon">🔄</div>
+        <div class="help-text">
+          <strong>Flip a card</strong>
+          <span>Tap the card or the Flip button to see the translation. Swipe left/right to go to the next or previous card. Swipe up/down to flip.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🔥</div>
+        <div class="help-text">
+          <strong>Retire (Master) a card</strong>
+          <span>Tap the teal 🔥 button when you know a word well. The card goes up in flames and is removed from rotation. Find all retired cards in the Mastered tab, where you can restore them any time.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">⭐</div>
+        <div class="help-text">
+          <strong>Favourites</strong>
+          <span>Tap the ☆ star button to save a card to your Favourites for quick review. Access them from the Favourites tab in the nav.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">✅</div>
+        <div class="help-text">
+          <strong>Got it / Missed it</strong>
+          <span>Rate yourself after flipping a card. This powers the spaced repetition system — cards you miss come back sooner, cards you know get spaced further apart.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🧠</div>
+        <div class="help-text">
+          <strong>Quiz</strong>
+          <span>Test yourself with multiple choice or type-in answers. The quiz skips any cards you've already mastered. Claude AI helps mark typed answers generously.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🔊</div>
+        <div class="help-text">
+          <strong>Listen</strong>
+          <span>Tap the 🔊 speaker button to hear the Spanish pronunciation. On the card front it speaks the word, on the back it reads all conjugations.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🔀</div>
+        <div class="help-text">
+          <strong>Shuffle</strong>
+          <span>Tap Shuffle to randomise the card order in any deck.</span>
+        </div>
+      </div>
+
+      <div class="help-item">
+        <div class="help-icon">🟢🟡🔴</div>
+        <div class="help-text">
+          <strong>Regularity badges (tense cards)</strong>
+          <span>Green = Regular conjugation. Yellow = Stem-change (the pattern is shown). Red = Irregular — needs to be memorised.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
