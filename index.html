@@ -6095,7 +6095,7 @@ function showTenseCard(t) {
   // Regularity badge (only on tense screens, not pres/fut which use en directly)
   var regBadgeEl = document.getElementById(t + '-reg-badge');
   if (regBadgeEl) {
-    var rb = getRegBadge(v.en);
+    var rb = getRegBadge(v.verb, v.en);  // pass verb for lookup + raw en for hints
     regBadgeEl.textContent = rb.label;
     regBadgeEl.className = 'reg-badge ' + rb.cls;
     regBadgeEl.style.display = 'inline-block';
@@ -6181,7 +6181,7 @@ function buildTenseFavCard(t) {
     tableHTML += `<div class="verb-row"><span class="pronoun">${pr}</span><span class="conjugation">${conj}</span></div>`;
   }
   const backHTML = `<div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:8px;flex-shrink:0;">${tenseHTML}</div><div class="card-back-content">${tableHTML}</div>`;
-  var rb = getRegBadge(v.en);
+  var rb = getRegBadge(v.verb, v.en);
   var regHTML = '<span class="reg-badge ' + rb.cls + '">' + rb.label + '</span>';
   return { type:t, id: getCurrentFavId(t), frontMain: enForTense(v.en, t), frontSub: '', tenseHTML, regHTML, source:`${tenseName} · ${v.verb}`, speakText: v.verb, speakBack: JSON.stringify(Object.entries(v.conj).map(([pr,c]) => pr + ' ' + c)), backHTML };
 }
@@ -7634,20 +7634,69 @@ function showVocabCat(cat) {
 }
 
 // ── REGULARITY BADGE ────────────────────────────────────────────────────────
-function getRegBadge(rawEn) {
+// Lookup table built from VERBS array reg fields + tense deck stem-change patterns
+var VERB_REG_MAP = {};
+var STEM_PATTERN_MAP = {};
+
+function buildVerbRegMap() {
+  // Extract reg data from VERBS array
+  VERBS.forEach(function(v) {
+    if (v.reg && v.verb && !VERB_REG_MAP[v.verb]) {
+      VERB_REG_MAP[v.verb] = v.reg;
+    }
+  });
+  // Extract stem-change patterns from TENSE_DECKS en fields
+  var allDecks = [TENSE_DECKS.pret, TENSE_DECKS.imp, TENSE_DECKS.subj, TENSE_DECKS.cond];
+  allDecks.forEach(function(deck) {
+    if (!deck) return;
+    deck.forEach(function(entry) {
+      var stemMatch = (entry.en || '').match(/\(([oeuiOEUI]→[^)]+)\)/);
+      if (stemMatch) {
+        STEM_PATTERN_MAP[entry.verb] = stemMatch[1];
+        // Also map the base verb if it's a slash combo like 'ser / ir'
+        entry.verb.split('/').forEach(function(v) {
+          STEM_PATTERN_MAP[v.trim()] = stemMatch[1];
+        });
+      }
+      // Also pick up regular hints from en field
+      var enL = (entry.en || '').toLowerCase();
+      if (!VERB_REG_MAP[entry.verb]) {
+        if (enL.indexOf('regular') !== -1 || /\(-ar[),]/.test(enL) || /\(-er[),]/.test(enL) || /\(-ir[),]/.test(enL)) {
+          VERB_REG_MAP[entry.verb] = 'regular';
+        }
+      }
+    });
+  });
+}
+
+function getRegBadge(verb, rawEn) {
+  // Ensure map is built
+  if (Object.keys(VERB_REG_MAP).length === 0) buildVerbRegMap();
+
+  // 1. Check stem-change pattern map first (most specific)
+  if (STEM_PATTERN_MAP[verb]) {
+    return { cls: 'reg-stem', label: STEM_PATTERN_MAP[verb] };
+  }
+  // 2. Also check raw en field for stem-change pattern (pres/fut tenses)
   var en = rawEn || '';
-  // Stem-change: look for → pattern in parentheses
   var stemMatch = en.match(/\(([oeuiOEUI]→[^)]+)\)/);
   if (stemMatch) {
     return { cls: 'reg-stem', label: stemMatch[1] };
   }
-  // Regular: explicitly marked
+  // 3. Look up verb in reg map
+  var reg = VERB_REG_MAP[verb];
+  if (reg === 'regular') return { cls: 'reg-regular', label: 'Regular' };
+  if (reg === 'stem-change') {
+    return { cls: 'reg-stem', label: 'Stem-change' };
+  }
+  if (reg === 'irregular') return { cls: 'reg-irregular', label: 'Irregular' };
+  // 4. Fall back to en field hints
   var enLower = en.toLowerCase();
   if (enLower.indexOf('regular') !== -1 ||
       /\(-ar[),]/.test(enLower) || /\(-er[),]/.test(enLower) || /\(-ir[),]/.test(enLower)) {
     return { cls: 'reg-regular', label: 'Regular' };
   }
-  // Irregular: anything else with conjugation data
+  // 5. Default irregular if unknown
   return { cls: 'reg-irregular', label: 'Irregular' };
 }
 
