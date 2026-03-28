@@ -6202,7 +6202,27 @@ function buildTenseFavCard(t) {
 // FAVOURITES SYSTEM
 // ══════════════════════════════════════════════
 // Each fav is stored as: { type:'verb'|'vocab'|'t150', id:string, frontMain:string, frontSub:string, source:string, backHTML:string }
-let favs = JSON.parse(localStorage.getItem('mexispeak_favs') || '[]');
+let favs = (function() {
+  try {
+    var stored = JSON.parse(localStorage.getItem('mexispeak_favs') || '[]');
+    // Sanitise any old entries with undefined source/tense from before the fix
+    var tenseNames = { pres:'Present', fut:'Future', pret:'Pretérito Indefinido', imp:'Imperfect', subj:'Present Subjunctive', cond:'Conditional', t150:'Top 150' };
+    return stored.map(function(f) {
+      // Fix undefined source
+      if (!f.source || f.source.indexOf('undefined') !== -1) {
+        var tenseName = tenseNames[f.type] || f.type || 'Verb';
+        var verb = (f.id || '').replace(/^[^:]+::/, '');
+        f.source = tenseName + ' · ' + verb;
+      }
+      // Fix undefined tenseHTML
+      if (f.tenseHTML && f.tenseHTML.indexOf('undefined') !== -1) {
+        var tenseName = tenseNames[f.type] || f.type || 'Verb';
+        f.tenseHTML = '<span class="tense-badge">' + tenseName + '</span>';
+      }
+      return f;
+    });
+  } catch(e) { return []; }
+})();
 let favDeck = [], favIdx = 0, favFlipped = false;
 
 function saveFavs() { localStorage.setItem('mexispeak_favs', JSON.stringify(favs)); }
@@ -6249,7 +6269,7 @@ function toggleFav(type) {
     let card;
     if (type === 'vocab') card = buildVocabFavCard();
     else if (type === 't150') card = buildT150FavCard();
-    else if (['pres','pret','imp','subj','cond'].includes(type)) card = buildTenseFavCard(type);
+    else if (['pres','fut','pret','imp','subj','cond'].includes(type)) card = buildTenseFavCard(type);
     else if (type === 'fav') {
       favs.splice(favIdx, 1);
       saveFavs();
