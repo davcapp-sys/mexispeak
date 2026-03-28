@@ -6185,8 +6185,8 @@ function shuffleTenseDeck(t) {
 function buildTenseFavCard(t) {
   const s = tenseDeckState[t];
   const v = s.deck[s.idx];
-  const tenseNames = { pret:'Pretérito Indefinido', imp:'Imperfect', subj:'Present Subjunctive', cond:'Conditional' };
-  const tenseName = tenseNames[t];
+  const tenseNames = { pres:'Present', fut:'Future', pret:'Pretérito Indefinido', imp:'Imperfect', subj:'Present Subjunctive', cond:'Conditional' };
+  const tenseName = tenseNames[t] || t;
   const tenseHTML = `<span class="tense-badge">${tenseName}</span>`;
   let tableHTML = '';
   for (const [pr, conj] of Object.entries(v.conj)) {
@@ -6231,7 +6231,10 @@ function buildVocabFavCard() {
 function buildT150FavCard() {
   const v = top150Deck[top150Idx];
   const backHTML = `<div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,7vw,4.5rem);color:var(--accent2);line-height:1;margin-bottom:10px;">${v.verb}</div>${buildConjTable(v.verb)}`;
-  return { type:'t150', id: getCurrentFavId('t150'), frontMain: v.en, frontSub: `#${v.rank} Most Commonly Used of 150`, source: `Top 150 · #${v.rank}`, speakText: v.verb, speakBack: JSON.stringify(buildConjPhrases(v.verb, top150ActiveTense || 'present')), backHTML };
+  const tenseHTML = '<span class="tense-badge">Top 150</span>';
+  var rb = getRegBadge(v.verb, v.en);
+  var regHTML = '<span class="reg-badge ' + rb.cls + '">' + rb.label + '</span>';
+  return { type:'t150', id: getCurrentFavId('t150'), frontMain: v.en, frontSub: `#${v.rank} Most Commonly Used of 150`, tenseHTML, regHTML, source: `Top 150 · #${v.rank}`, speakText: v.verb, speakBack: JSON.stringify(buildConjPhrases(v.verb, top150ActiveTense || 'present')), backHTML };
 }
 
 function toggleFav(type) {
