@@ -1081,7 +1081,7 @@
     .ans-btn         { font-size: 0.75rem; padding: 6px 9px; border-radius: 9px; }
     .ans-shuffle     { padding: 8px 11px; }
     .ans-flip        { padding: 8px 11px; }
-    .retire-btn { padding: 6px 9px !important; font-size: 1.4rem !important; }
+    .retire-btn { padding: 8px 14px !important; font-size: 1.5rem !important; min-width: 44px; }
 
   .fav-btn, .speak-btn { width: 34px; height: 34px; font-size: 0.95rem; }
 
@@ -1174,7 +1174,7 @@
     .nav-arrow { width: 30px; height: 30px; min-width: 30px; font-size: 1rem; }
     #answer-btns, .answer-btns { gap: 5px; flex-wrap: nowrap; }
     .ans-btn  { font-size: 0.72rem; padding: 6px 9px; }
-    .retire-btn { padding: 6px 9px !important; font-size: 1.4rem !important; }
+    .retire-btn { padding: 8px 14px !important; font-size: 1.5rem !important; min-width: 44px; }
 
   .fav-btn, .speak-btn { width: 30px; height: 30px; font-size: 0.85rem; }
 
@@ -1532,7 +1532,7 @@
       </div>
       <div class="answer-btns" id="vocab-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="vocab-fav-btn" onclick="toggleFav('vocab')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="vocab-retire-btn" onclick="toggleRetire('vocab')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="vocab-retire-btn" onclick="toggleRetire('vocab')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="vocab-speak-btn" onclick="speakCard('vocab-card', document.getElementById('vc-es').textContent, this)" title="Front: speak Spanish word · Back: speak Spanish word">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipVocabCard()">🔄 Flip</button>
         <div class="sa-btns">
@@ -1594,7 +1594,7 @@
 
       <div id="top150-btns" style="display:flex;gap:10px;flex-shrink:0;padding-bottom:4px;flex-wrap:wrap;justify-content:center;align-items:center;">
         <button class="fav-btn" id="t150-fav-btn" onclick="toggleFav('t150')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="t150-retire-btn" onclick="toggleRetire('t150')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="t150-retire-btn" onclick="toggleRetire('t150')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="t150-speak-btn" onclick="speakCard('t150-card', document.getElementById('t150-verb-text').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" style="background:var(--btn-bg);border:2px solid var(--btn-hover);color:var(--text-sub);padding:14px 22px;" onclick="flipTop150()">🔄 Flip</button>
         <div class="sa-btns">
@@ -1641,7 +1641,7 @@
         </div>
         <div id="favs-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;flex-shrink:0;">
           <button class="fav-btn active" id="fav-remove-btn" onclick="toggleFav('fav')" title="Remove from Favourites" style="border-color:gold;">★</button>
-          <button class="retire-btn" id="fav-retire-btn" onclick="toggleRetire('fav')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+          <button class="retire-btn" id="fav-retire-btn" onclick="toggleRetire('fav')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
           <button class="speak-btn" id="fav-speak-btn" onclick="speakCard('fav-card', document.getElementById('fav-card').dataset.speak, this)" title="Front: speak Spanish · Back: speak conjugations or word">🔊</button>
           <button class="ans-btn ans-flip" id="fav-flip-btn" style="background:var(--btn-bg);border:2px solid var(--btn-hover);color:var(--text-sub);padding:14px 22px;" onclick="flipFavCard()">🔄 Flip</button>
           <div class="sa-btns">
@@ -1857,7 +1857,7 @@
       </div>
       <div class="answer-btns" id="pres-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="pres-fav-btn" onclick="toggleFav('pres')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="pres-retire-btn" onclick="toggleRetire('pres')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="pres-retire-btn" onclick="toggleRetire('pres')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="pres-speak-btn" onclick="speakCard('pres-card', document.getElementById('pres-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('pres')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1894,7 +1894,7 @@
       </div>
       <div class="answer-btns" id="fut-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="fut-fav-btn" onclick="toggleFav('fut')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="fut-retire-btn" onclick="toggleRetire('fut')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="fut-retire-btn" onclick="toggleRetire('fut')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="fut-speak-btn" onclick="speakCard('fut-card', document.getElementById('fut-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('fut')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1931,7 +1931,7 @@
       </div>
       <div class="answer-btns" id="pret-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="pret-fav-btn" onclick="toggleFav('pret')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="pret-retire-btn" onclick="toggleRetire('pret')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="pret-retire-btn" onclick="toggleRetire('pret')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="pret-speak-btn" onclick="speakCard('pret-card', document.getElementById('pret-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('pret')">🔄 Flip</button>
         <div class="sa-btns">
@@ -1968,7 +1968,7 @@
       </div>
       <div class="answer-btns" id="imp-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="imp-fav-btn" onclick="toggleFav('imp')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="imp-retire-btn" onclick="toggleRetire('imp')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="imp-retire-btn" onclick="toggleRetire('imp')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="imp-speak-btn" onclick="speakCard('imp-card', document.getElementById('imp-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('imp')">🔄 Flip</button>
         <div class="sa-btns">
@@ -2005,7 +2005,7 @@
       </div>
       <div class="answer-btns" id="subj-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="subj-fav-btn" onclick="toggleFav('subj')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="subj-retire-btn" onclick="toggleRetire('subj')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="subj-retire-btn" onclick="toggleRetire('subj')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="subj-speak-btn" onclick="speakCard('subj-card', document.getElementById('subj-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('subj')">🔄 Flip</button>
         <div class="sa-btns">
@@ -2042,7 +2042,7 @@
       </div>
       <div class="answer-btns" id="cond-answer-btns" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
         <button class="fav-btn" id="cond-fav-btn" onclick="toggleFav('cond')" title="Add to Favourites">☆</button>
-        <button class="retire-btn" id="cond-retire-btn" onclick="toggleRetire('cond')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥</button>
+        <button class="retire-btn" id="cond-retire-btn" onclick="toggleRetire('cond')" title="Retire — never show again" style="padding:14px 22px;border-radius:14px;background:#4ecdc4;border-color:#4ecdc4;color:#fff;font-size:1.8rem;">🔥 Mastered</button>
         <button class="speak-btn" id="cond-speak-btn" onclick="speakCard('cond-card', document.getElementById('cond-verb').textContent, this)" title="Front: speak infinitive · Back: speak all conjugations">🔊</button>
         <button class="ans-btn ans-flip" onclick="flipTenseCard('cond')">🔄 Flip</button>
         <div class="sa-btns">
@@ -6800,7 +6800,7 @@ function initQuizScreen() {
 
 function startQuiz() {
   const deckVal = document.getElementById('quiz-deck-select').value;
-  quizDeckKey = deckVal + '_' + quizMode;  // separate SR per mode (mc vs type)
+  quizDeckKey = deckVal;  // pure deck key for card lookups
   const allCards = buildQuizDeck(deckVal);
 
   if (allCards.length === 0) {
@@ -6814,7 +6814,8 @@ function startQuiz() {
     return;
   }
 
-  const srData = loadSR(quizDeckKey);
+  const srKey = quizDeckKey + '_' + quizMode;  // mode-specific SR key
+  const srData = loadSR(srKey);
 
   // Split into due and not-due
   let due = allCards.filter(c => isDue(srData[c.cardId]));
@@ -6966,11 +6967,12 @@ function selectQuizAnswer(btn, chosen, correct) {
   quizSessionTotal++;
   if (isCorrect) quizSessionCorrect++;
 
-  // Update SR
-  const srData = loadSR(quizDeckKey);
+  // Update SR with mode-specific key
+  const srModeKey = quizDeckKey + '_' + quizMode;
+  const srData = loadSR(srModeKey);
   const card = quizDeck[quizIdx];
   srData[card.cardId] = scheduleCard(srData[card.cardId], isCorrect);
-  saveSR(quizDeckKey, srData);
+  saveSR(srModeKey, srData);
 
   // Visual feedback on buttons
   const allBtns = document.querySelectorAll('.quiz-opt-btn');
@@ -7203,9 +7205,10 @@ function finishTypedAnswer(inp, typed, correct, exactMatch, accentlessMatch, cla
   quizSessionTotal++;
   if (isCorrect) quizSessionCorrect++;
 
-  const srData = loadSR(quizDeckKey);
+  const srModeKey2 = quizDeckKey + '_' + quizMode;
+  const srData = loadSR(srModeKey2);
   srData[card.cardId] = scheduleCard(srData[card.cardId], isCorrect);
-  saveSR(quizDeckKey, srData);
+  saveSR(srModeKey2, srData);
 
   if (exactMatch || claudeCorrect) {
     inp.classList.add('correct');
