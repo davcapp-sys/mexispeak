@@ -7581,13 +7581,15 @@ function updateMasteredIndicators() {
 
 function updateNavBtnPct(screenId, r) {
   var btns = document.querySelectorAll('.nav-btn');
-  var map = {top150:0, pres:1, pret:2, imp:3, subj:4, cond:5, vocab:6, favs:7, mastered:8, quiz:9};
+  var map = {top150:0, pres:0, fut:0, pret:0, imp:0, subj:0, cond:0, favs:4, mastered:5, quiz:6};
   var idx = map[screenId];
   if (idx === undefined) return;
   var btn = btns[idx];
   if (!btn) return;
-  var base = btn.getAttribute('data-base-text') || btn.textContent.replace(/\s*🔥.*$/, '').replace(/\s*\(\d+%\).*$/, '').trim();
+  var base = btn.getAttribute('data-base-text') || btn.textContent.replace(/\s*🔥\d+%.*$/, '').replace(/\s*\(\d+%\).*$/, '').trim();
   btn.setAttribute('data-base-text', base);
+  // Don't modify the Mastered nav button (idx 5) - it already has 🔥 in its label
+  if (idx === 5) return;
   if (r.total > 0 && r.done > 0) {
     var pct = Math.round(r.done / r.total * 100);
     btn.textContent = base + ' 🔥' + pct + '%';
