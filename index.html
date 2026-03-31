@@ -1235,20 +1235,59 @@
     100% { transform: scale(0.8)  translateY(-24px); filter: brightness(3)   saturate(6) hue-rotate(-50deg); opacity: 0; }
   }
   @keyframes emberPop {
-    0%   { transform: translate(0,0) scale(1); opacity: 1; }
+    0%   { transform: translate(0,0) scale(1.2); opacity: 1; }
+    40%  { transform: translate(calc(var(--ex)*0.6), calc(var(--ey)*0.6)) scale(1); opacity: 1; }
     100% { transform: translate(var(--ex), var(--ey)) scale(0); opacity: 0; }
   }
+  @keyframes shockwave {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.9; border-width: 6px; }
+    60%  { opacity: 0.4; border-width: 2px; }
+    100% { transform: translate(-50%,-50%) scale(3.5); opacity: 0; border-width: 1px; }
+  }
+  @keyframes flashOverlay {
+    0%   { opacity: 0; }
+    15%  { opacity: 0.35; }
+    100% { opacity: 0; }
+  }
+  @keyframes cardShake {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    15%  { transform: translate(-4px, -6px) rotate(-1.5deg); }
+    30%  { transform: translate(5px, -4px) rotate(1deg); }
+    45%  { transform: translate(-3px, 3px) rotate(-0.8deg); }
+    60%  { transform: translate(4px, 2px) rotate(0.5deg); }
+    75%  { transform: translate(-2px, -2px) rotate(-0.3deg); }
+  }
+  @keyframes starBurst {
+    0%   { transform: translate(-50%,-50%) scale(0) rotate(0deg); opacity: 1; }
+    50%  { opacity: 0.8; }
+    100% { transform: translate(-50%,-50%) scale(1) rotate(45deg); opacity: 0; }
+  }
   .card-on-fire {
-    animation: flameUp 0.7s ease-in forwards !important;
+    animation: flameUp 0.9s ease-in forwards, cardShake 0.5s ease-in-out !important;
     pointer-events: none;
+    z-index: 10;
   }
   .ember {
     position: fixed;
-    width: 8px; height: 8px;
-    border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
-    animation: emberPop 0.6s ease-out forwards;
+    animation: emberPop 0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+  }
+  .shockwave {
+    position: fixed;
+    border-radius: 50%;
+    border: 5px solid #ff6600;
+    pointer-events: none;
+    z-index: 9998;
+    animation: shockwave 0.6s ease-out forwards;
+  }
+  .flash-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, #ff8c00 0%, #ff4500 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 9997;
+    animation: flashOverlay 0.5s ease-out forwards;
   }
 
   /* ── HUB SCREENS ── */
@@ -7601,52 +7640,101 @@ function updateNavBtnPct(screenId, r) {
 
 // ── CARD FLAME ANIMATION ────────────────────────────────────────────────────
 function cardOnFire(type) {
-  // Find the card element for this screen type
   var cardId = {
-    vocab: 'vocab-card',
-    t150:  't150-card',
-    pres:  'pres-card',
-    fut:   'fut-card',
-    pret:  'pret-card',
-    imp:   'imp-card',
-    subj:  'subj-card',
-    cond:  'cond-card',
-    fav:   'fav-card',
+    vocab:'vocab-card', t150:'t150-card', pres:'pres-card', fut:'fut-card',
+    pret:'pret-card', imp:'imp-card', subj:'subj-card', cond:'cond-card', fav:'fav-card',
   }[type];
   if (!cardId) return;
   var card = document.getElementById(cardId);
   if (!card) return;
 
-  // Add fire class
+  var rect = card.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top  + rect.height / 2;
+
+  // ── Flash overlay ──
+  var flash = document.createElement('div');
+  flash.className = 'flash-overlay';
+  document.body.appendChild(flash);
+  setTimeout(function() { flash.remove(); }, 600);
+
+  // ── Shockwave rings (3 rings staggered) ──
+  [0, 80, 160].forEach(function(delay) {
+    var ring = document.createElement('div');
+    ring.className = 'shockwave';
+    var size = 60 + delay;
+    ring.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;' +
+      'width:' + size + 'px;height:' + size + 'px;' +
+      'animation-delay:' + delay + 'ms;' +
+      'border-color:' + (delay === 0 ? '#ff4500' : delay === 80 ? '#ff8c00' : '#ffd700') + ';';
+    document.body.appendChild(ring);
+    setTimeout(function(r) { r.remove(); }, 900 + delay, ring);
+  });
+
+  // ── Card shake + fire ──
   card.classList.add('card-on-fire');
 
-  // Spawn ember particles
-  var rect = card.getBoundingClientRect();
-  var colors = ['#ff4500','#ff6600','#ff8c00','#ffd700','#ff2200','#ffaa00'];
-  for (var i = 0; i < 20; i++) {
-    var ember = document.createElement('div');
-    ember.className = 'ember';
-    var x = rect.left + Math.random() * rect.width;
-    var y = rect.top  + Math.random() * rect.height;
-    var angle = (Math.random() * 360) * Math.PI / 180;
-    var dist  = 40 + Math.random() * 80;
-    var ex = Math.cos(angle) * dist;
-    var ey = Math.sin(angle) * dist - 60; // bias upward
-    ember.style.cssText =
-      'left:' + x + 'px;top:' + y + 'px;' +
-      'background:' + colors[Math.floor(Math.random() * colors.length)] + ';' +
-      '--ex:' + ex + 'px;--ey:' + ey + 'px;' +
-      'animation-delay:' + (Math.random() * 0.15) + 's;' +
-      'width:' + (4 + Math.random() * 8) + 'px;' +
-      'height:' + (4 + Math.random() * 8) + 'px;';
-    document.body.appendChild(ember);
-    setTimeout(function(e) { e.remove(); }, 800, ember);
+  // ── Ember particles — 3 waves ──
+  var fireColors  = ['#ff4500','#ff6600','#ff2200','#ff8c00'];
+  var goldColors  = ['#ffd700','#ffaa00','#ffe066','#ffc200'];
+  var sparkColors = ['#ffffff','#fffde0','#4ecdc4','#ff6b35'];
+
+  function spawnEmbers(count, colorSet, distMin, distMax, delayOffset, duration, shapes) {
+    for (var i = 0; i < count; i++) {
+      var ember = document.createElement('div');
+      ember.className = 'ember';
+      var x = cx + (Math.random() - 0.5) * rect.width * 0.8;
+      var y = cy + (Math.random() - 0.5) * rect.height * 0.6;
+      var angle = (Math.random() * 360) * Math.PI / 180;
+      var dist  = distMin + Math.random() * (distMax - distMin);
+      var ex = Math.cos(angle) * dist;
+      var ey = Math.sin(angle) * dist - dist * 0.5; // bias upward
+      var size = 4 + Math.random() * 10;
+      var color = colorSet[Math.floor(Math.random() * colorSet.length)];
+      var shape = shapes ? (Math.random() > 0.5 ? '50%' : '3px') : '50%';
+      ember.style.cssText =
+        'left:' + x + 'px;top:' + y + 'px;' +
+        'width:' + size + 'px;height:' + size + 'px;' +
+        'background:' + color + ';' +
+        'border-radius:' + shape + ';' +
+        'box-shadow: 0 0 ' + (size*1.5) + 'px ' + color + ';' +
+        '--ex:' + ex + 'px;--ey:' + ey + 'px;' +
+        'animation-duration:' + duration + 'ms;' +
+        'animation-delay:' + (delayOffset + Math.random() * 80) + 'ms;';
+      document.body.appendChild(ember);
+      setTimeout(function(e) { e.remove(); }, duration + delayOffset + 200, ember);
+    }
   }
 
-  // Remove fire class after animation
+  // Wave 1: fire burst — immediately
+  spawnEmbers(20, fireColors, 60, 160, 0, 700, false);
+  // Wave 2: gold sparks — slight delay
+  spawnEmbers(15, goldColors, 80, 200, 60, 900, true);
+  // Wave 3: bright sparks — more delay, travel further
+  spawnEmbers(12, sparkColors, 100, 240, 120, 1000, true);
+
+  // ── Star burst emoji floaters ──
+  ['🔥','⭐','✨','💥'].forEach(function(emoji, i) {
+    var star = document.createElement('div');
+    star.textContent = emoji;
+    var angle = (i / 4) * Math.PI * 2 + Math.random() * 0.5;
+    var dist = 80 + Math.random() * 60;
+    star.style.cssText =
+      'position:fixed;left:' + cx + 'px;top:' + cy + 'px;' +
+      'font-size:' + (1.4 + Math.random() * 0.8) + 'rem;' +
+      'pointer-events:none;z-index:10000;' +
+      'animation:emberPop 0.9s ease-out forwards;' +
+      '--ex:' + (Math.cos(angle)*dist) + 'px;' +
+      '--ey:' + (Math.sin(angle)*dist - dist*0.8) + 'px;' +
+      'animation-delay:' + (i * 40) + 'ms;';
+    document.body.appendChild(star);
+    setTimeout(function(s) { s.remove(); }, 1200, star);
+  });
+
+  // ── Remove fire class ──
   setTimeout(function() {
     card.classList.remove('card-on-fire');
-  }, 750);
+  }, 900);
 }
 
 // ── AUTO-SHRINK CARD BACK FONT ───────────────────────────────────────────────
