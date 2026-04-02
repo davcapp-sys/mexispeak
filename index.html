@@ -7097,25 +7097,26 @@ function normaliseAnswer(str) {
 function checkTypedMatch(typed, correct) {
   // Split answer on / or , to get all valid variants
   const variants = correct.split(/[\/,]/).map(v => v.trim()).filter(Boolean);
+  // Also add the typed string with slashes stripped as an extra variant to check
+  // e.g. typing "bonito/bonita" should match correct "bonito/bonita"
+  const typedVariants = [typed, ...typed.split(/[\/,]/).map(v => v.trim()).filter(Boolean)];
   const normTyped = normaliseAnswer(typed);
 
-  for (const v of variants) {
-    const normV = normaliseAnswer(v);
-
-    // Exact match: typed and correct normalise to the same string
-    // normaliseAnswer strips accents, punctuation, articles, case — so
-    // "Buenas noches" matches "buenas noches", "me llamo" matches "Me llamo" etc.
-    if (normTyped === normV) {
-      // Now check whether the user actually included the accents correctly
-      // by comparing the pre-normalised (accents kept) lowercased versions
-      const typedLower = typed.toLowerCase().trim()
-        .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
-        .replace(/[¿¡?!.,;:]/g, '').replace(/\s+/g, ' ').trim();
-      const vLower = v.toLowerCase().trim()
-        .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
-        .replace(/[¿¡?!.,;:]/g, '').replace(/\s+/g, ' ').trim();
-      const hasAccents = (typedLower === vLower);
-      return { exactMatch: hasAccents, accentlessMatch: !hasAccents, isCorrect: true };
+  // Check each typed variant against each correct variant
+  for (const tVar of typedVariants) {
+    const normT = normaliseAnswer(tVar);
+    for (const v of variants) {
+      const normV = normaliseAnswer(v);
+      if (normT === normV) {
+        const typedLower = tVar.toLowerCase().trim()
+          .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
+          .replace(/[¿¡?!.,;:]/g, '').replace(/\s+/g, ' ').trim();
+        const vLower = v.toLowerCase().trim()
+          .replace(/^(el|la|los|las|un|una|unos|unas)\s+/, '')
+          .replace(/[¿¡?!.,;:]/g, '').replace(/\s+/g, ' ').trim();
+        const hasAccents = (typedLower === vLower);
+        return { exactMatch: hasAccents, accentlessMatch: !hasAccents, isCorrect: true };
+      }
     }
   }
   return { exactMatch: false, accentlessMatch: false, isCorrect: false };
