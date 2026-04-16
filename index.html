@@ -2188,9 +2188,9 @@
 
       <!-- Question card -->
       <div id="quiz-card" style="width:min(96%,700px);background:var(--card-front);border:2px solid var(--accent1);border-radius:var(--radius);padding:14px 24px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow);flex-shrink:0;min-height:60px;justify-content:center;">
-        <div id="quiz-card-label" style="font-size:0.7rem;font-weight:900;letter-spacing:3px;color:var(--accent1);text-transform:uppercase;"></div>
-        <div id="quiz-question" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,5vw,3rem);color:var(--accent2);text-align:center;line-height:1.1;"></div>
-        <div id="quiz-question-sub" style="font-size:0.95rem;color:var(--text-sub);text-align:center;"></div>
+        <div id="quiz-card-label" style="font-size:0.85rem;font-weight:900;letter-spacing:2px;color:var(--accent1);text-transform:uppercase;"></div>
+        <div id="quiz-question" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,6vw,3.8rem);color:var(--accent2);text-align:center;line-height:1.1;"></div>
+        <div id="quiz-question-sub" style="font-size:1.05rem;color:var(--text-sub);text-align:center;font-weight:700;"></div>
       </div>
 
       <!-- Options -->
@@ -6758,34 +6758,62 @@ function buildQuizDeck(deckVal, skipRetireFilter) {
     });
   } else if (deckVal.startsWith('tense_')) {
     const t = deckVal.replace('tense_', '');
-    const tenseNames = {pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional'};
+    const tenseNames = {pres:'Present', fut:'Future', pret:'Pretérito', imp:'Imperfect', subj:'Subjunctive', cond:'Conditional'};
     const deck = TENSE_DECKS[t] || [];
     const pronouns = ['yo','tú','él/ella/usted','nosotros','ustedes'];
     const prEN = {'yo':'I','tú':'you','él/ella/usted':'he/she/you','nosotros':'we','ustedes':'you all'};
+    // Map tense key to conjugation lookup table for cross-tense distractors
+    const conjMaps = {
+      pres: TOP150_CONJ, fut: TOP150_FUT, pret: TOP150_PRET,
+      imp: TOP150_IMP, subj: TOP150_SUBJ, cond: TOP150_COND
+    };
     deck.forEach(v => {
       pronouns.forEach(pr => {
         if (!v.conj[pr]) return;
+        // Build same-verb cross-tense distractors for this pronoun
+        // Use other tense maps to get conjugations of the SAME verb in different tenses
+        var sameVerbDistractors = [];
+        Object.entries(conjMaps).forEach(function([tKey, map]) {
+          if (tKey === t) return; // skip the current tense
+          var conj = map[v.verb];
+          if (conj && conj[pr] && conj[pr] !== v.conj[pr]) {
+            sameVerbDistractors.push(conj[pr]);
+          }
+        });
+        // Also check TENSE_DECKS for hardcoded tenses (pret/imp/subj/cond have their own decks)
+        Object.entries(TENSE_DECKS).forEach(function([tKey, tDeck]) {
+          if (tKey === t || !Array.isArray(tDeck)) return;
+          var entry = tDeck.find(function(d) { return d.verb === v.verb; });
+          if (entry && entry.conj[pr] && entry.conj[pr] !== v.conj[pr]) {
+            sameVerbDistractors.push(entry.conj[pr]);
+          }
+        });
+        // Dedupe
+        sameVerbDistractors = [...new Set(sameVerbDistractors)].filter(x => x !== v.conj[pr]);
+        // Fallback pool: other verbs same tense same pronoun (if not enough cross-tense)
+        var fallbackPool = deck.map(d => d.conj[pr]).filter(Boolean).filter(x => x !== v.conj[pr]);
         cards.push({
-          label: tenseNames[t] + ' — ' + pr + ' (' + prEN[pr] + ')',
-          question: v.en,
-          questionSub: '',
+          label: tenseNames[t] + ' · ' + v.verb,
+          question: pr + ' (' + prEN[pr] + ')',
+          questionSub: v.en,
           answer: v.conj[pr],
-          pool: deck.map(d => d.conj[pr]).filter(Boolean),
+          sameVerbDistractors: sameVerbDistractors,
+          pool: fallbackPool,
           cardId: 'tense_' + t + '_' + v.verb.replace(/\s+/g,'_') + '_' + pr,
           type: 'tense'
         });
       });
     });
   } else if (deckVal === 'favs') {
-    const favs = loadFavs();
-    favs.forEach(v => {
+    const favsList = JSON.parse(localStorage.getItem('mexispeak_favs') || '[]');
+    favsList.forEach(v => {
       if (v.type === 'vocab') {
         cards.push({
           label: '⭐ Favourite',
           question: v.frontMain,
           questionSub: '→ What is this in Spanish?',
           answer: v.speakText || '',
-          pool: favs.filter(f => f.type === 'vocab'),
+          pool: favsList.filter(f => f.type === 'vocab'),
           cardId: 'fav_' + (v.id||'').replace(/\s+/g,'_'),
           type: 'fav_vocab'
         });
@@ -6796,7 +6824,7 @@ function buildQuizDeck(deckVal, skipRetireFilter) {
           question: v.frontMain,
           questionSub: v.source || '',
           answer: v.speakText || v.frontMain,
-          pool: favs.filter(f => f.type !== 'vocab'),
+          pool: favsList.filter(f => f.type !== 'vocab'),
           cardId: 'fav_' + (v.id||'').replace(/\s+/g,'_'),
           type: 'fav_verb'
         });
@@ -6810,21 +6838,37 @@ function buildQuizDeck(deckVal, skipRetireFilter) {
 }
 
 function getDistractors(card, allCards, count) {
-  // Build pool of wrong answers from filtered deck first (mastered already excluded)
-  let wrong = allCards
-    .filter(c => c.cardId !== card.cardId && c.answer !== card.answer)
-    .map(c => c.answer);
-  // If not enough, top up from full deck (including mastered as fallback only)
+  let wrong = [];
+
+  // For tense cards: prefer same-verb cross-tense distractors
+  if (card.sameVerbDistractors && card.sameVerbDistractors.length > 0) {
+    wrong = [...card.sameVerbDistractors];
+    // Shuffle same-verb distractors
+    for (let i = wrong.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [wrong[i], wrong[j]] = [wrong[j], wrong[i]];
+    }
+  }
+
+  // Top up with fallback pool if needed (other verbs same tense)
+  if (wrong.length < count) {
+    const fallback = (card.pool || [])
+      .filter(a => a !== card.answer && !wrong.includes(a));
+    wrong = [...wrong, ...fallback];
+  }
+
+  // Top up from full deck if still short
   if (wrong.length < count) {
     const fullDeck = buildQuizDeck(quizDeckKey, true);
     const extra = fullDeck
       .filter(c => c.cardId !== card.cardId && c.answer !== card.answer && !quizCardRetired(c))
-      .map(c => c.answer);
+      .map(c => c.answer)
+      .filter(a => !wrong.includes(a));
     wrong = [...wrong, ...extra];
   }
-  // Dedupe
-  const unique = [...new Set(wrong)];
-  // Shuffle and take
+
+  // Dedupe and shuffle
+  const unique = [...new Set(wrong)].filter(a => a !== card.answer);
   for (let i = unique.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i+1));
     [unique[i], unique[j]] = [unique[j], unique[i]];
