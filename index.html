@@ -6806,27 +6806,77 @@ function buildQuizDeck(deckVal, skipRetireFilter) {
     });
   } else if (deckVal === 'favs') {
     const favsList = JSON.parse(localStorage.getItem('mexispeak_favs') || '[]');
+    // Known pronouns in order
+    const favPrEN = {'yo':'I','tú':'you','él/ella/usted':'he/she/you','nosotros':'we','ustedes':'you all'};
+    const favPronounList = ['yo','tú','él/ella/usted','nosotros','ustedes'];
+    // Conjugation maps for cross-tense distractors
+    const favConjMaps = {
+      pres:TOP150_CONJ, fut:TOP150_FUT, pret:TOP150_PRET,
+      imp:TOP150_IMP, subj:TOP150_SUBJ, cond:TOP150_COND
+    };
+    const favTenseNames = {pres:'Present',fut:'Future',pret:'Pretérito',imp:'Imperfect',subj:'Present Subjunctive',cond:'Conditional',t150:'Top 150'};
+
     favsList.forEach(v => {
       if (v.type === 'vocab') {
+        // Vocab fav — simple translation quiz
         cards.push({
           label: '⭐ Favourite',
           question: v.frontMain,
           questionSub: '→ What is this in Spanish?',
           answer: v.speakText || '',
-          pool: favsList.filter(f => f.type === 'vocab'),
+          pool: favsList.filter(f => f.type === 'vocab').map(f => f.speakText).filter(Boolean),
           cardId: 'fav_' + (v.id||'').replace(/\s+/g,'_'),
           type: 'fav_vocab'
         });
-      } else {
-        // Verb fav — quiz on the infinitive
-        cards.push({
-          label: '⭐ Favourite — ' + (v.source || ''),
-          question: v.frontMain,
-          questionSub: v.source || '',
-          answer: v.speakText || v.frontMain,
-          pool: favsList.filter(f => f.type !== 'vocab'),
-          cardId: 'fav_' + (v.id||'').replace(/\s+/g,'_'),
-          type: 'fav_verb'
+      } else if (v.speakBack) {
+        // Verb fav — expand into one card per pronoun using speakBack data
+        var tenseKey = v.type; // 'pres','fut','pret' etc
+        var tenseName = favTenseNames[tenseKey] || v.type;
+        // Extract verb from source e.g. "Present · hablar"
+        var verbName = v.source ? v.source.split(' · ').pop() : (v.speakText || '');
+        // Parse speakBack into pronoun/conjugation pairs
+        var pairs = [];
+        try { pairs = JSON.parse(v.speakBack); } catch(e) {}
+        pairs.forEach(function(pair) {
+          // Find which pronoun this pair starts with
+          var foundPr = null, foundConj = null;
+          for (var pi = 0; pi < favPronounList.length; pi++) {
+            var pr = favPronounList[pi];
+            if (pair.startsWith(pr + ' ')) {
+              foundPr = pr;
+              foundConj = pair.slice(pr.length + 1);
+              break;
+            }
+          }
+          if (!foundPr || !foundConj) return;
+          // Build cross-tense distractors for this verb+pronoun
+          var sameVerbDistractors = [];
+          Object.entries(favConjMaps).forEach(function([tKey, map]) {
+            if (tKey === tenseKey) return;
+            var conj = map[verbName];
+            if (conj && conj[foundPr] && conj[foundPr] !== foundConj) {
+              sameVerbDistractors.push(conj[foundPr]);
+            }
+          });
+          // Also check TENSE_DECKS for hardcoded entries
+          Object.entries(TENSE_DECKS).forEach(function([tKey, tDeck]) {
+            if (tKey === tenseKey || !Array.isArray(tDeck)) return;
+            var entry = tDeck.find(function(d) { return d.verb === verbName; });
+            if (entry && entry.conj[foundPr] && entry.conj[foundPr] !== foundConj) {
+              sameVerbDistractors.push(entry.conj[foundPr]);
+            }
+          });
+          sameVerbDistractors = [...new Set(sameVerbDistractors)];
+          cards.push({
+            label: '⭐ ' + tenseName + ' · ' + verbName,
+            question: foundPr + ' (' + (favPrEN[foundPr] || foundPr) + ')',
+            questionSub: v.frontMain,
+            answer: foundConj,
+            sameVerbDistractors: sameVerbDistractors,
+            pool: [],
+            cardId: 'fav_' + (v.id||'').replace(/\s+/g,'_') + '_' + foundPr.replace(/\//g,'_'),
+            type: 'fav_verb'
+          });
         });
       }
     });
